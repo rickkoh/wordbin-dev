@@ -1,5 +1,5 @@
 import React from 'react';
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, View, Button, Alert, Picker, TouchableOpacity, ScrollView, FlatList, Dimensions } from 'react-native';
+import { DeviceEventEmitter, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, Button, Alert, Picker, TouchableOpacity, ScrollView, FlatList, ListView } from 'react-native';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
 import { SQLite } from 'expo-sqlite';
@@ -22,8 +22,7 @@ class AddWordScreen extends React.Component {
             word: {
                 word_id: undefined,
                 word_text: undefined,
-                word_class: undefined,
-                word_pronounciation: undefined,
+                word_pronunciation: undefined,
                 word_origin: undefined,
                 word_datetimeadded: undefined,
             },
@@ -40,21 +39,31 @@ class AddWordScreen extends React.Component {
                     tag: undefined,
                 }
             ],
-            datetimeadded: undefined,
             meaningCurrentIndex: undefined,
             keyboardBarType: undefined,
             wordIsValidated: false,
             wordHasAPIdata: false,
+            datetimeadded: undefined,
             isValidated: false,
         }
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.state.word.word_text != undefined && this.state.word.word_text != "") {
+        // Run validation test
+
+        // Check for word
+        if (this.state.word.word_text != undefined && this.state.word.word_text != "" && this.state.word.word_text.length <= 64) {
             if (prevState.isValidated != true) this.setState({ isValidated: true });
         } else {
             if (prevState.isValidated != false) this.setState({ isValidated: false });
         }
+
+        // Check for meaning
+        // Check for other props
+        // Update other props
+    }
+
+    componentWillUnmount() {
     }
 
     handleWordChange = (text) => {
@@ -62,8 +71,8 @@ class AddWordScreen extends React.Component {
         this.setState({ word: this.state.word });
     }
 
-    handlePronounciationChange = (text) => {
-        this.state.word.word_pronounciation = text;
+    handlePronunciationChange = (text) => {
+        this.state.word.word_pronunciation = text;
         this.setState({ word: this.state.word });
     }
 
@@ -128,8 +137,12 @@ class AddWordScreen extends React.Component {
     }
 
     addButtonPressed = () => {
-        this.state.word.word_id = database.addWord(this.state.word);
-        console.log(this.state.word);
+        database.addWord(this.state.word, null, (word_id) => {
+            database.addMeanings(word_id, this.state.meaning, null, () => {
+                DeviceEventEmitter.emit("word_added");
+                this.props.navigation.goBack();
+            });
+        });
     }
 
     renderKeyboardBar = () => {
@@ -191,10 +204,10 @@ class AddWordScreen extends React.Component {
                     onChangeText={this.handleWordChange}
                     onFocus={() => this.setState({ keyboardBarType: 'word' })}
                 />
-                <PronounciationInput
-                    ref={(ref) => { this.pronounciationInput = ref }}
-                    value={this.state.word.word_pronounciation}
-                    onChangeText={this.handlePronounciationChange}
+                <PronunciationInput
+                    ref={(ref) => { this.pronunciationInput = ref }}
+                    value={this.state.word.word_pronunciation}
+                    onChangeText={this.handlePronunciationChange}
                     onFocus={() => this.setState({ keyboardBarType: 'word' })}
                 />
                 <MeaningInput
@@ -251,7 +264,7 @@ class WordInput extends React.Component {
 
 }
 
-class PronounciationInput extends React.Component {
+class PronunciationInput extends React.Component {
 
     wordTextInputStyle = function(){
         return {
@@ -268,7 +281,8 @@ class PronounciationInput extends React.Component {
                 style={this.wordTextInputStyle()}
                 value={this.props.value}
                 onFocus={this.props.onFocus}
-                placeholder="/  Pronounciation  /"
+                fontStyle={'italic'}
+                placeholder="/  Pronunciation  /"
                 onChangeText={(text) => this.props.onChangeText(text)}
             />
         )
@@ -317,6 +331,7 @@ class MeaningInput extends React.Component {
 
     renderMeaningItem = ({item, index}) => {
         return(
+            <View style={{flex: 1}}>
             <TextInput
                 multiline
                 style={{width: SCREEN_WIDTH, flex: 1, fontSize: 16, paddingHorizontal: 20, textAlignVertical: 'top'}}
@@ -325,6 +340,7 @@ class MeaningInput extends React.Component {
                 placeholder="Meaning of word"
                 onChangeText={(text) => this.props.onChangeText(text, index)}
             />
+            </View>
         )
     }
 
@@ -382,12 +398,15 @@ class TagInput extends React.Component {
 
     renderTagItem = ({item, index}) => {
         return(
-            <View style={{marginRight: 5, marginBottom: 10, flexDirection: 'row',  borderRadius: 5, backgroundColor: '#f4f7f8'}}>
-                <Text style={{padding: 5, paddingRight: 0}}>{item.tag}</Text>
-                <ClearButton
-                    color='lightgray'
-                    onPress={() => this.props.onPress(index)}
-                />
+            <View style={{marginBottom: 10, flexDirection: 'row', justifyContent: 'center'}}>
+                <View style={{flexDirection: 'row',  borderRadius: 5, backgroundColor: '#f4f7f8'}}>
+                    <Text style={{padding: 5, paddingRight: 0}}>{item.tag}</Text>
+                    <ClearButton
+                        color='lightgray'
+                        onPress={() => this.props.onPress(index)}
+                    />
+                </View>
+                <TextInput style={{margin: 2, minWidth: 5}}/>
             </View>
         )
     }

@@ -1,5 +1,8 @@
 import React from 'react';
-import { createStackNavigator, createDrawerNavigator, createAppContainer } from 'react-navigation';
+import { View, Text } from 'react-native';
+import { createStackNavigator, createDrawerNavigator, createAppContainer, DrawerItems } from 'react-navigation';
+
+import SideMenu from './components/Navigation/SideMenu';
 
 // Screens
 import HomeScreen from './screens/Home';
@@ -41,6 +44,13 @@ const DrawerNavigator = createDrawerNavigator({
         },
     },
     Settings: SettingsScreen,
+},
+{
+    contentComponent: props => 
+        <View style={{paddingTop: 44}}>
+            <DrawerItems {...props} />
+            <SideMenu/>
+        </View>
 });
 
 // Root Stack
