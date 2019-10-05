@@ -1,15 +1,15 @@
 import React from 'react';
-import { DeviceEventEmitter, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, Button, Alert, Picker, TouchableOpacity, ScrollView, FlatList, ListView } from 'react-native';
-import { Dropdown } from 'react-native-material-dropdown';
+import { DeviceEventEmitter, KeyboardAvoidingView, Text, TextInput, View, TouchableOpacity, FlatList } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { SQLite } from 'expo-sqlite';
+import ModalDropdown from 'react-native-modal-dropdown';
 
-import { colors, headerStyles, buttonStyles } from '../Styles';
+import { colors, headerStyles } from '../Styles';
 import { SCREEN_WIDTH } from '../Measurements';
 
 import Header from '../components/Header';
 import ClearButton from '../components/ClearButton';
 import PillButton from '../components/PillButton';
+import FlippableForm from '../components/FlippableForm';
 
 import database from '../services/Database';
 
@@ -19,6 +19,7 @@ class AddWordScreen extends React.Component {
         super(props);
 
         this.state = {
+            asdf: 1,
             word: {
                 word_id: undefined,
                 word_text: undefined,
@@ -49,21 +50,16 @@ class AddWordScreen extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        // Run validation test
-
-        // Check for word
+        // Validate Word
         if (this.state.word.word_text != undefined && this.state.word.word_text != "" && this.state.word.word_text.length <= 64) {
             if (prevState.isValidated != true) this.setState({ isValidated: true });
         } else {
             if (prevState.isValidated != false) this.setState({ isValidated: false });
         }
-
-        // Check for meaning
-        // Check for other props
-        // Update other props
     }
 
     componentWillUnmount() {
+        DeviceEventEmitter.emit("database_changed");
     }
 
     handleWordChange = (text) => {
@@ -96,7 +92,6 @@ class AddWordScreen extends React.Component {
 
     removeMeaning = () => {
         meaning = this.state.meaning;
-        console.log(this.state.meaningCurrentIndex);
         meaning.splice(this.state.meaningCurrentIndex, 1);
         this.setState({ meaning: meaning })
     }
@@ -131,18 +126,28 @@ class AddWordScreen extends React.Component {
         this.setState({ tags: tags });
     }
 
-    handleTypeChange = (text, index) => {
-        meaning = this.state.meaning;
-        meaning[index].type = text;
-    }
-
     addButtonPressed = () => {
-        database.addWord(this.state.word, null, (word_id) => {
-            database.addMeanings(word_id, this.state.meaning, null, () => {
-                DeviceEventEmitter.emit("word_added");
-                this.props.navigation.goBack();
-            });
+        database.addWord(this.state.word,
+            (errorMessage) => console.log(errorMessage),
+            (word_id) => {
+
+                // Requires some updating
+
+                if (this.state.meaning.length > 0) {
+                    database.addMeanings(word_id,
+                        this.state.meaning,
+                        (errorMessage) => complete(),
+                        () => {
+                            complete();
+                        });
+                } else {
+                    complete();
+                }
         });
+
+        complete = () => {
+            this.props.navigation.goBack();
+        }
     }
 
     renderKeyboardBar = () => {
@@ -269,7 +274,7 @@ class PronunciationInput extends React.Component {
     wordTextInputStyle = function(){
         return {
             height: 40,
-            fontSize: 14,
+            fontSize: 16,
             paddingHorizontal: 20,
         }
     }
@@ -281,8 +286,7 @@ class PronunciationInput extends React.Component {
                 style={this.wordTextInputStyle()}
                 value={this.props.value}
                 onFocus={this.props.onFocus}
-                fontStyle={'italic'}
-                placeholder="/  Pronunciation  /"
+                placeholder="Pronunciation"
                 onChangeText={(text) => this.props.onChangeText(text)}
             />
         )
@@ -330,21 +334,29 @@ class MeaningInput extends React.Component {
     }
 
     renderMeaningItem = ({item, index}) => {
+        data = [{value: 'Noun'}, {value: 'Proverb'}]
         return(
             <View style={{flex: 1}}>
-            <TextInput
-                multiline
-                style={{width: SCREEN_WIDTH, flex: 1, fontSize: 16, paddingHorizontal: 20, textAlignVertical: 'top'}}
-                value={item.meaning}
-                onFocus={this.props.onFocus}
-                placeholder="Meaning of word"
-                onChangeText={(text) => this.props.onChangeText(text, index)}
-            />
+                <TextInput
+                    multiline
+                    style={{width: SCREEN_WIDTH, flex: 1, fontSize: 16, paddingHorizontal: 20, textAlignVertical: 'top'}}
+                    value={item.meaning}
+                    onFocus={this.props.onFocus}
+                    placeholder="Meaning of word"
+                    onChangeText={(text) => this.props.onChangeText(text, index)}
+                />
+                <View style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, marginVertical: 10}}>
+                    <TextInput style={{fontSize: 16, marginRight: 20, flex: 1}} placeholder="Classification"/>
+                    <TouchableOpacity>
+                        <Text style={{color: colors.default.blue}}>More options</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         )
     }
 
     onViewableItemsChanged = ({ viewableItems }) => {
+        // Update index
         this.setState({ currentIndex: viewableItems[0].index + 1 });
         this.props.onIndexChange(viewableItems[0].index);
     }

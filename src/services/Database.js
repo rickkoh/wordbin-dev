@@ -219,11 +219,17 @@ class Database {
                 (_, { insertId }) => word_id = insertId
             );
         }, error => {
-            console.log(error);
-            error_callback(error);
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
         }, success => {
-            console.log('word added');
-            success_callback(word_id);
+            try {
+                success_callback(word_id);
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 
@@ -242,9 +248,17 @@ class Database {
                 (_, { insertId }) => meaning_id = insertId
             );
         }, error => {
-            error_callback(error);
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
         }, success => {
-            success_callback(meaning_id);
+            try {
+                success_callback(meaning_id);
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 
@@ -257,9 +271,17 @@ class Database {
                 (_, { insertId }) => series_id = insertId
             );
         }, error => {
-            error_callback(error);
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
         }, success => {
-            success_callback(series_id);
+            try {
+                success_callback(series_id);
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 
@@ -271,9 +293,17 @@ class Database {
                 (_)
             )
         }, error => {
-            error_callback(error);
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
         }, success => {
-            success_callback(true);
+            try {
+                success_callback(true);
+            } catch (error) {
+                console.log(error);
+            }
         })
     }
 
@@ -286,9 +316,17 @@ class Database {
                 (_, {rows: { _array } }) => result = _array
             )
         }, error => {
-            error_callback(error);
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
         }, success => {
-            success_callback(result);
+            try {
+                success_callback(result);
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 
@@ -301,9 +339,17 @@ class Database {
                 (_, {rows: { _array } }) => result = _array 
             );
         }, error => {
-            error_callback(error);
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
         }, success => {
-            success_callback(result)
+            try {
+                success_callback(result)
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 
@@ -316,9 +362,17 @@ class Database {
                 (_, {rows: { _array } }) => result = _array 
             );
         }, error => {
-            error_callback(error);
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
         }, success => {
-            success_callback(result)
+            try {
+                success_callback(result)
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 
@@ -331,9 +385,17 @@ class Database {
                 (_, {rows: { _array } }) => result = _array 
             );
         }, error => {
-            error_callback(error);
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
         }, success => {
-            success_callback(result)
+            try {
+                success_callback(result)
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 
@@ -346,9 +408,17 @@ class Database {
                 (_, {rows: { _array } }) => result = _array
             )
         }, error => {
-            error_callback(error);
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
         }, success => {
-            success_callback(result);
+            try {
+                success_callback(result);
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 
@@ -361,9 +431,17 @@ class Database {
                 (_, {rows: { _array } }) => result = _array
             )
         }, error => {
-            error_callback(error);
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
         }, success => {
-            success_callback(result);
+            try {
+                success_callback(result);
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 
@@ -376,9 +454,17 @@ class Database {
                 (_, {rows: { _array } }) => result = _array
             )
         }, error => {
-            error_callback(error);
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
         }, success => {
-            success_callback(result);
+            try {
+                success_callback(result);
+            } catch (error) {
+                console.log(error);
+            }
         })
     }
 
@@ -391,9 +477,17 @@ class Database {
                 (_, {rows: { _array } }) => result = _array
             )
         }, error => {
-            error_callback(error);
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
         }, success => {
-            success_callback(result);
+            try {
+                success_callback(result);
+            } catch (error) {
+                console.log(error);
+            }
         })
     }
 
@@ -406,9 +500,17 @@ class Database {
                 (_, {rows: { _array } }) => result = _array
             )
         }, error => {
-            error_callback(error);
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
         }, success => {
-            success_callback(result);
+            try {
+                success_callback(result);
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 

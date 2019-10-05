@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { createStackNavigator, createDrawerNavigator, createAppContainer, DrawerItems } from 'react-navigation';
 
+// Components
 import SideMenu from './components/Navigation/SideMenu';
 
 // Screens

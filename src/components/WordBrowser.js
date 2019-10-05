@@ -4,6 +4,8 @@ import { FlatList } from 'react-native';
 import WordCard from './WordCard';
 
 class WordBrowser extends React.Component {
+    // Collects data
+    // And then displays the data in the list form
     render() {
         return(
             <FlatList

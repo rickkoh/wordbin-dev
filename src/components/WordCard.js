@@ -1,17 +1,17 @@
 import React from 'react';
-import { View, Text, FlatList } from 'react-native';
+import { View, Text, FlatList, ScrollView, ListView } from 'react-native';
 
 import { colors } from '../Styles';
+
+import HorizontalList from './HorizontalList';
 
 import Tag from './Tag';
 
 class WordCard extends React.Component {
-
-    // Displaying of objects are done
-    // Requires cleaning and moving components to individual files
-
     render() {
-        data = [{text: "Tags:"}, {text: "English"}, {text: "Language"}, {text: "Funadamentals"}]
+
+    temp_tags = [{text: "Tags: "}, {text: "English"}, {text: "Language"}, {text: "Fundamentals"}];
+        
         return(
                 <View style={{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 5, borderWidth: 1, borderColor: colors.default.lightgray}}>
                     <Text style={{fontSize: 20, marginBottom: 5 }}>{this.props.word.word_text}</Text>
@@ -20,21 +20,17 @@ class WordCard extends React.Component {
                     )}
                     <FlatList
                         data={this.props.word.Meanings}
-                        extraData={this.state}
                         renderItem={this.renderMeaning}
                         keyExtractor={(item, index) => index.toString()}
                         listKey={(item, index) => index.toString()}
                     />
-                    {data.length <= 1 ? null : (
-                        <FlatList
-                            data={data}
-                            extraData={this.state}
-                            style={{flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center'}}
-                            renderItem={this.renderTag} 
-                            keyExtractor={(item, index) => index.toString()}
-                            listKey={(item, index) => index.toString()}
-                        />
-                    )}
+                    <FlatList
+                        data={temp_tags}
+                        style={{flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center'}}
+                        renderItem={this.renderTag} 
+                        keyExtractor={(item, index) => index.toString()}
+                        listKey={(item, index) => index.toString()}
+                    />
                 </View>
         )
     }
@@ -47,7 +43,6 @@ class WordCard extends React.Component {
                 {synonym.length <= 1 ? null : (
                     <FlatList
                         data={synonym}
-                        extraData={this.state}
                         style={{flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center'}}
                         renderItem={this.renderTag} 
                         keyExtractor={(item, index) => index.toString()}
@@ -65,15 +60,36 @@ class WordCard extends React.Component {
                     <Text style={{fontSize: 12, color: 'green'}}>{item.text}</Text>
                 </View>
             )
-        } else if (index==1 && item.text == undefined) {
-            return (
-                <Tag value="-"/>
-            )
         } else {
             return (
                 <Tag value={item.text}/>
             )
         }
+    }
+}
+
+class MeaningItem extends React.Component {
+    render() {
+        return(
+            <View>
+                <Text style={{fontSize: 14, marginBottom: 7.5 }}>{this.prop.item.meaning_text}</Text>
+                <FlatList
+                    data={this.prop.item.Synonyms}
+                    style={{flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center'}}
+                    renderItem={this.renderTag} 
+                    keyExtractor={(item, index) => index.toString()}
+                    listKey={(item, index) => index.toString()}
+                />
+            </View>
+        )
+    }
+}
+
+class TagItem extends React.Component {
+    render() {
+        return(
+            null
+        )
     }
 }
 

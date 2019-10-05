@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, View, Button, TouchableOpacity, FlatList, DeviceEventEmitter } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, DeviceEventEmitter } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 
 import database from '../services/Database';
@@ -40,8 +40,11 @@ export default class SettingsScreen extends React.Component {
                 <TouchableOpacity onPress={() => this.downloadDictionaryDatabase()} style={styles.addButton}>
                     <Text style={{color: "white"}}>Download Dictionary</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.resetDatabase()} style={styles.addButton}>
+                <TouchableOpacity onPress={() => database.resetDatabase()} style={styles.addButton}>
                     <Text style={{color: "white"}}>Reset Database</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => database.printDatabaseLocation()} style={styles.addButton}>
+                    <Text style={{color: "white"}}>Print database location in console</Text>
                 </TouchableOpacity>
             </View>
         );
