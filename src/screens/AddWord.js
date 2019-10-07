@@ -1,7 +1,6 @@
 import React from 'react';
-import { DeviceEventEmitter, KeyboardAvoidingView, Text, TextInput, View, TouchableOpacity, FlatList } from 'react-native';
+import { DeviceEventEmitter, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity, FlatList } from 'react-native';
 import { Icon } from 'react-native-elements';
-import ModalDropdown from 'react-native-modal-dropdown';
 
 import { colors, headerStyles } from '../Styles';
 import { SCREEN_WIDTH } from '../Measurements';
@@ -9,7 +8,7 @@ import { SCREEN_WIDTH } from '../Measurements';
 import Header from '../components/Header';
 import ClearButton from '../components/ClearButton';
 import PillButton from '../components/PillButton';
-import FlippableForm from '../components/FlippableForm';
+import MeaningForm from '../components/Forms/MeaningForm';
 
 import database from '../services/Database';
 
@@ -19,7 +18,6 @@ class AddWordScreen extends React.Component {
         super(props);
 
         this.state = {
-            asdf: 1,
             word: {
                 word_id: undefined,
                 word_text: undefined,
@@ -215,11 +213,11 @@ class AddWordScreen extends React.Component {
                     onChangeText={this.handlePronunciationChange}
                     onFocus={() => this.setState({ keyboardBarType: 'word' })}
                 />
-                <MeaningInput
+                <MeaningForm
                     ref={(ref) => { this.meaningInput = ref }}
                     data={this.state.meaning}
-                    onIndexChange={(index) => this.setState({ meaningCurrentIndex:index })}
-                    onChangeText={this.handleMeaningChange}
+                    onMeaningIndexChange={(index) => this.setState({ meaningCurrentIndex:index })}
+                    onMeaningTextChange={this.handleMeaningChange}
                     onFocus={() => this.setState({ keyboardBarType: 'meaning' })}
                 />
                 <TagInput
@@ -292,91 +290,6 @@ class PronunciationInput extends React.Component {
         )
     }
 
-}
-
-class OriginInput extends React.Component {
-
-    wordTextInputStyle = function(){
-        return {
-            height: 30,
-            fontSize: 16,
-            paddingHorizontal: 20,
-        }
-    }
-
-    render() {
-        return(
-            <TextInput
-                ref={(input) => { this.wordInput = input; }}
-                style={this.wordTextInputStyle()}
-                value={this.props.value}
-                onFocus={this.props.onFocus}
-                placeholder="Origin"
-                onChangeText={(text) => this.props.onChangeText(text)}
-            />
-        )
-    }
-
-}
-
-class MeaningInput extends React.Component {
-
-    constructor(props){
-        super(props);
-
-        this.state = {
-            currentIndex: 1,
-        }
-    }
-
-    scrollToIndex = (index, animated) => {
-        this.flatList.scrollToIndex({animated: animated, index: index});
-    }
-
-    renderMeaningItem = ({item, index}) => {
-        data = [{value: 'Noun'}, {value: 'Proverb'}]
-        return(
-            <View style={{flex: 1}}>
-                <TextInput
-                    multiline
-                    style={{width: SCREEN_WIDTH, flex: 1, fontSize: 16, paddingHorizontal: 20, textAlignVertical: 'top'}}
-                    value={item.meaning}
-                    onFocus={this.props.onFocus}
-                    placeholder="Meaning of word"
-                    onChangeText={(text) => this.props.onChangeText(text, index)}
-                />
-                <View style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, marginVertical: 10}}>
-                    <TextInput style={{fontSize: 16, marginRight: 20, flex: 1}} placeholder="Classification"/>
-                    <TouchableOpacity>
-                        <Text style={{color: colors.default.blue}}>More options</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        )
-    }
-
-    onViewableItemsChanged = ({ viewableItems }) => {
-        // Update index
-        this.setState({ currentIndex: viewableItems[0].index + 1 });
-        this.props.onIndexChange(viewableItems[0].index);
-    }
-
-    render() {
-        return(
-            <FlatList
-                horizontal
-                pagingEnabled
-                style={{ flex: 1 }}
-                showsHorizontalScrollIndicator={false}
-                ref={(ref) => { this.flatList = ref }}
-                data={this.props.data}
-                renderItem={this.renderMeaningItem}
-                onViewableItemsChanged={this.onViewableItemsChanged}
-                keyExtractor={(item, index) => index.toString()}
-                listKey={(item, index) => index.toString()}
-            />
-        )
-    }
 }
 
 class TagInput extends React.Component {

@@ -3,7 +3,7 @@
   "expoServerPort": null,
   "packagerPort": null,
   "packagerPid": null,
-  "expoServerNgrokUrl": null,
-  "packagerNgrokUrl": null,
-  "ngrokPid": null
+  "expoServerNgrokUrl": "https://4z-9qc.rickkoh.wordbin-dev.exp.direct",
+  "packagerNgrokUrl": "https://packager.4z-9qc.rickkoh.wordbin-dev.exp.direct",
+  "ngrokPid": 66947
 }

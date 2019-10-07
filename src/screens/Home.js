@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, TouchableOpacity, FlatList, DeviceEventEmitter, ListView } from 'react-native';
+import { Text, TextInput, View, TouchableOpacity, FlatList, DeviceEventEmitter, ListView } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { SQLite } from 'expo-sqlite';
 
