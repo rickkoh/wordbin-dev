@@ -307,6 +307,62 @@ class Database {
         })
     }
 
+    addTags = (tag_array, error_callback, success_callback) => {
+        tag_array.forEach(async (tag) => {
+            this.addTag(tag, error_callback, success_callback);
+        });
+    }
+
+    addTag = (tag, error_callback, success_callback) => {
+        db.transaction(tx => {
+            tx.executeSql(
+                INSERT_TAG_QUERY,
+                [tag.tag_title],
+                (null)
+            );
+        }, error => {
+            try{
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
+        }, success => {
+            try {
+                success_callback(true);
+            } catch (error) {
+                console.log(error);
+            }
+        })
+    }
+
+    addWordTags = (word_id, tag_array, error_callback, success_callback) => {
+        tag_array.forEach(async (tag) => {
+            this.addWordTag(word_id, tag.tag_id, error_callback, success_callback);
+        });
+    }
+
+    addWordTag = (word_id, tag_id, error_callback, success_callback) => {
+        db.transaction(tx => {
+            tx.executeSql(
+                INSERT_WORDTAG_QUERY,
+                [word_id, tag_id],
+                (_)
+            );
+        }, error => {
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
+        }, success => {
+            try {
+                success_callback(true);
+            } catch (error) {
+                console.log(error);
+            }
+        })
+    }
+
     getWords = (error_callback, success_callback) => {
         result = undefined;
         db.transaction(tx => {
@@ -392,6 +448,7 @@ class Database {
             }
         }, success => {
             try {
+                console.log(result);
                 success_callback(result)
             } catch (error) {
                 console.log(error);

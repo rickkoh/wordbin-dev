@@ -11,13 +11,6 @@ import WordBrowser from '../components/WordBrowser';
 import AddActionButton from '../components/AddActionButton';
 import database from '../services/Database';
 
-const db = SQLite.openDatabase('db.db');
-
-const hapticOptions = {
-    enableVibrateFallback: true,
-    ignoreAndroidSystemSettings: false
-};
-
 export default class HomeScreen extends React.Component {
 
     // Constructor
@@ -109,6 +102,15 @@ export default class HomeScreen extends React.Component {
         loadWords();
     }
 
+    test = () => {
+        database.getTags(
+            (errorMessage) => console.log(errorMessage),
+            (data) => {
+                console.log(data);
+            }
+        )
+    }
+
     // Render
     render() {
         console.log("render");
@@ -129,7 +131,7 @@ export default class HomeScreen extends React.Component {
                     }
                     headerRight={
                         <TouchableOpacity
-                            onPress={() => console.log(this.state)}
+                            onPress={this.test}
                             style={headerStyles.headerButtonRight}>
                             <Icon name='grid' type="entypo" color={colors.default.primaryColor}/>
                         </TouchableOpacity>

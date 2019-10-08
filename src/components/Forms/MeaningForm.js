@@ -61,7 +61,7 @@ class MeaningForm extends React.Component {
                     style={styles.classificationTextInput}
                     placeholder="Classification"
                     value={item.meaning_classification}
-                    onChangeText={(text) => this.props.onClassificationChange(text, index)}/>
+                    onChangeText={(text) => this.props.onClassificationTextChange(text, index)}/>
                     <TouchableOpacity onPress={() => console.log('open modal')}>
                         <Text style={{color: colors.default.blue}}>More options</Text>
                     </TouchableOpacity>

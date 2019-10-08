@@ -3,18 +3,28 @@ import { DeviceEventEmitter, KeyboardAvoidingView, StyleSheet, Text, TextInput, 
 import { Icon } from 'react-native-elements';
 
 import { colors, headerStyles } from '../Styles';
-import { SCREEN_WIDTH } from '../Measurements';
 
 import Header from '../components/Header';
-import ClearButton from '../components/ClearButton';
 import PillButton from '../components/PillButton';
+import WordInput from '../components/Forms/WordInput';
+import PronunciationInput from '../components/Forms/PronunciationInput';
 import MeaningForm from '../components/Forms/MeaningForm';
+import TagForm from '../components/Forms/TagForm';
 
 import database from '../services/Database';
 
+// Search for tags
+// If tags already exist
+// Link them
+// Else
+// Create new tags
+// And then link them
+// Occasionally do some tags merging for example if there are identical tag_titles, merge them together, convert all the wordtags to the first tag id
+// Tags are not case sensitive
+
 class AddWordScreen extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -35,7 +45,7 @@ class AddWordScreen extends React.Component {
             ],
             tags: [
                 {
-                    tag: undefined,
+                    tag_title: undefined,
                 }
             ],
             meaningCurrentIndex: undefined,
@@ -47,6 +57,7 @@ class AddWordScreen extends React.Component {
         }
     }
 
+    // Perform validation
     componentDidUpdate(prevProps, prevState) {
         // Validate Word
         if (this.state.word.word_text != undefined && this.state.word.word_text != "" && this.state.word.word_text.length <= 64) {
@@ -56,18 +67,13 @@ class AddWordScreen extends React.Component {
         }
     }
 
+    componentDidMount() {
+        this.wordInput.focus();
+    }
+
+    // Notify listeners
     componentWillUnmount() {
         DeviceEventEmitter.emit("database_changed");
-    }
-
-    handleWordChange = (text) => {
-        this.state.word.word_text = text;
-        this.setState({ word: this.state.word });
-    }
-
-    handlePronunciationChange = (text) => {
-        this.state.word.word_pronunciation = text;
-        this.setState({ word: this.state.word });
     }
 
     handleMeaningChange = (text, index) => {
@@ -88,6 +94,13 @@ class AddWordScreen extends React.Component {
         this.setState({ meaning: meaning });
     }
 
+    handleClassificationChange = (text, index) => {
+        meaning = this.state.meaning;
+        meaning[index].meaning_classification = text;
+        
+        this.setState({ meaning: meaning });
+    }
+
     removeMeaning = () => {
         meaning = this.state.meaning;
         meaning.splice(this.state.meaningCurrentIndex, 1);
@@ -99,7 +112,7 @@ class AddWordScreen extends React.Component {
             this.addTag();
         } else {
             tags = this.state.tags;
-            tags[tags.length-1].tag = text;
+            tags[tags.length-1].tag_title = text;
             this.setState({ tags: tags });
         }
     }
@@ -111,10 +124,11 @@ class AddWordScreen extends React.Component {
 
     addTag = () => {
         tags = this.state.tags;
-        text = tags[tags.length-1].tag;
+        text = tags[tags.length-1].tag_title;
         if (text != undefined && text.length>0) {
-            tags = tags.concat({tag: undefined});
+            tags = tags.concat({tag_title: undefined});
             this.setState({ tags: tags });
+            console.log(this.state);
         }
     }
 
@@ -129,7 +143,14 @@ class AddWordScreen extends React.Component {
             (errorMessage) => console.log(errorMessage),
             (word_id) => {
 
-                // Requires some updating
+                if (this.state.tags.length > 0) {
+                    database.addTags(
+                        this.state.tags,
+                        (errorMessage) => {},
+                        () => {
+                            console.log('tags added');
+                        });
+                }
 
                 if (this.state.meaning.length > 0) {
                     database.addMeanings(word_id,
@@ -148,6 +169,8 @@ class AddWordScreen extends React.Component {
         }
     }
 
+    // convert this to a component
+    // idea is to design the keyboard bar using a form (or an array/object)
     renderKeyboardBar = () => {
         return(
             <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
@@ -162,11 +185,11 @@ class AddWordScreen extends React.Component {
                     </TouchableOpacity>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-                    <TouchableOpacity onPress={() => {this.meaningInput.scrollToIndex(this.state.meaningCurrentIndex - 1)}}>
+                    <TouchableOpacity onPress={() => {this.meaningForm.scrollToIndex(this.state.meaningCurrentIndex - 1)}}>
                         <Icon name='chevron-left' color={colors.default.blue} size={22} opacity={0.25}/>
                     </TouchableOpacity>
                     <Text style={{fontSize: 16, color: colors.default.blue}}>{this.state.meaningCurrentIndex + 1}/{this.state.meaning.length}</Text>
-                    <TouchableOpacity onPress={() => {this.meaningInput.scrollToIndex(this.state.meaningCurrentIndex + 1)}}>
+                    <TouchableOpacity onPress={() => {this.meaningForm.scrollToIndex(this.state.meaningCurrentIndex + 1)}}>
                         <Icon name='chevron-right' color={colors.default.blue} size={22} opacity={0.25}/>
                     </TouchableOpacity>
                 </View>
@@ -204,29 +227,28 @@ class AddWordScreen extends React.Component {
                 <WordInput
                     ref={(ref) => { this.wordInput = ref }}
                     value={this.state.word.word_text}
-                    onChangeText={this.handleWordChange}
-                    onFocus={() => this.setState({ keyboardBarType: 'word' })}
+                    onChangeText={(text) => this.setState((prevState) => ({word: { ...prevState.word, word_text: text}}))}
+                    onFocus={() => this.setState({keyboardBarType: 'word'})}
                 />
                 <PronunciationInput
-                    ref={(ref) => { this.pronunciationInput = ref }}
                     value={this.state.word.word_pronunciation}
-                    onChangeText={this.handlePronunciationChange}
-                    onFocus={() => this.setState({ keyboardBarType: 'word' })}
+                    onChangeText={(text) => this.setState((prevState) => ({word: { ...prevState.word, word_pronunciation: text}}))}
+                    onFocus={() => this.setState({keyboardBarType: 'word'})}
                 />
                 <MeaningForm
-                    ref={(ref) => { this.meaningInput = ref }}
+                    ref={(ref) => { this.meaningForm = ref }}
                     data={this.state.meaning}
-                    onMeaningIndexChange={(index) => this.setState({ meaningCurrentIndex:index })}
+                    onMeaningIndexChange={(index) => this.setState({meaningCurrentIndex: index})}
                     onMeaningTextChange={this.handleMeaningChange}
-                    onFocus={() => this.setState({ keyboardBarType: 'meaning' })}
+                    onClassificationTextChange={this.handleClassificationChange}
+                    onFocus={() => this.setState({keyboardBarType: 'meaning'})}
                 />
-                <TagInput
-                    ref={(ref) => { this.tagInput = ref }}
-                    value={this.state.tags[this.state.tags.length-1].tag}
+                <TagForm
+                    value={this.state.tags[this.state.tags.length-1].tag_title}
                     data={this.state.tags}
                     onChangeText={this.handleTagChange}
                     onPress={this.removeTag}
-                    onFocus={() => this.setState({ keyboardBarType: 'tag' })}
+                    onFocus={() => this.setState({keyboardBarType: 'tag'})}
                     onBlur={this.addTag}
                 />
                 <KeyboardBar
@@ -234,121 +256,6 @@ class AddWordScreen extends React.Component {
                     enabled={this.state.isValidated}
                 />
             </KeyboardAvoidingView>
-        )
-    }
-}
-
-class WordInput extends React.Component {
-
-    componentDidMount() {
-        this.wordInput.focus();
-    }
-
-    wordTextInputStyle = function(){
-        return {
-            height: 40,
-            fontSize: 26,
-            paddingHorizontal: 20,
-        }
-    }
-
-    render() {
-        return(
-            <TextInput
-                ref={(input) => { this.wordInput = input; }}
-                style={this.wordTextInputStyle()}
-                value={this.props.value}
-                onFocus={this.props.onFocus}
-                placeholder="Word"
-                onChangeText={(text) => this.props.onChangeText(text)}
-            />
-        )
-    }
-
-}
-
-class PronunciationInput extends React.Component {
-
-    wordTextInputStyle = function(){
-        return {
-            height: 40,
-            fontSize: 16,
-            paddingHorizontal: 20,
-        }
-    }
-
-    render() {
-        return(
-            <TextInput
-                ref={(input) => { this.wordInput = input; }}
-                style={this.wordTextInputStyle()}
-                value={this.props.value}
-                onFocus={this.props.onFocus}
-                placeholder="Pronunciation"
-                onChangeText={(text) => this.props.onChangeText(text)}
-            />
-        )
-    }
-
-}
-
-class TagInput extends React.Component {
-
-    tagTextInputStyle = function() {
-        return {
-            height: 40,
-            paddingHorizontal: 20,
-            fontSize: 16,
-        }
-    }
-
-    scrollToIndex = (index, animated) => {
-        this.flatList.scrollToIndex({animated: animated, index: index});
-    }
-
-    renderTagList = () => {
-        data = [...this.props.data];
-        data.splice(data.length-1);
-        return(
-            <FlatList
-                data={data}
-                ref={(ref) => this.flatList = ref}
-                contentContainerStyle={{paddingHorizontal: 20, flexDirection: 'row', flexWrap: 'wrap', width: SCREEN_WIDTH}}
-                renderItem={this.renderTagItem}
-                keyExtractor={(item, index) => index.toString()}
-                listKey={(item, index) => index.toString()}
-            />
-        )
-    }
-
-    renderTagItem = ({item, index}) => {
-        return(
-            <View style={{marginBottom: 10, flexDirection: 'row', justifyContent: 'center'}}>
-                <View style={{flexDirection: 'row',  borderRadius: 5, backgroundColor: '#f4f7f8'}}>
-                    <Text style={{padding: 5, paddingRight: 0}}>{item.tag}</Text>
-                    <ClearButton
-                        color='lightgray'
-                        onPress={() => this.props.onPress(index)}
-                    />
-                </View>
-                <TextInput style={{margin: 2, minWidth: 5}}/>
-            </View>
-        )
-    }
-
-    render() {
-        return(
-            <View style={{ maxHeight: 160 }}>
-                <TextInput
-                    style={this.tagTextInputStyle()}
-                    value={this.props.value}
-                    placeholder="Tags"
-                    onChangeText={(text) => this.props.onChangeText(text)}
-                    onBlur={this.props.onBlur}
-                    onFocus={this.props.onFocus}
-                />
-                {this.renderTagList()}
-            </View>
         )
     }
 }
