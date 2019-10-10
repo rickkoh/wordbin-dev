@@ -10,15 +10,23 @@ import database from '../services/Database';
 
 class WordCard extends React.Component {
 
+    cleanString() {
+        this.cleanTag();
+    }
+
+    cleanTag() {
+        if (this.props.word.Tags.length > 0 && this.props.word.Tags[0].tag_title != "Tags: ") {
+            this.props.word.Tags.unshift({tag_title: "Tags: "})
+        }
+    }
+
     render() {
         
-        if (this.props.word.Tags.length > 0 && this.props.word.Tags[0].tag_title != 'Tags: ') {
-            this.props.word.Tags.unshift({tag_title: 'Tags: '})
-        }
+        this.cleanString();
 
         return(
             <TouchableOpacity onPress={() => console.log('hey')}>
-                <View style={{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 5, borderWidth: 1, borderColor: colors.default.lightgray}}>
+                <View style={{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 10, borderWidth: 1, borderColor: '#e1edf0', backgroundColor: '#fbfdfd'}}>
                     <View style={{alignItems: 'flex-end'}}>
                         <TouchableOpacity style={{marginLeft: 10, marginRight: 5}} onPress={() => {
                             database.deleteWord(this.props.word.word_id,

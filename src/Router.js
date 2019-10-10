@@ -12,6 +12,7 @@ import ViewWordScreen from './screens/ViewWord';
 import SettingsScreen from './screens/Settings';
 
 // Home Stack
+// Contains the screens that Home can navigate to
 const HomeStack = createStackNavigator(
     {
         Home: {
@@ -27,8 +28,6 @@ const HomeStack = createStackNavigator(
     {
         initialRouteName: 'Home',
         headerMode: 'screen',
-        headerStyle: {
-        },
         defaultNavigationOptions: {
             header: null
         }
@@ -38,13 +37,13 @@ const HomeStack = createStackNavigator(
 // Drawer Navigator
 const DrawerNavigator = createDrawerNavigator({
     Home: HomeStack,
-    AddWord: {
-        screen: AddWordScreen,
-        navigationOptions: {
-            drawerLabel: 'Add word',
-        },
-    },
-    Settings: SettingsScreen,
+    //AddWord: {
+        //screen: AddWordScreen,
+        //navigationOptions: {
+            //drawerLabel: 'Add word',
+        //},
+    //},
+    //Settings: SettingsScreen,
 },
 {
     contentComponent: props => 

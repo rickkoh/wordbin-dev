@@ -244,6 +244,7 @@ class AddWordScreen extends React.Component {
         start();
     }
 
+    // Type stupid shit here and get scolded
     // convert this to a component
     // idea is to design the keyboard bar using a form (or an array/object)
     renderKeyboardBar = () => {
@@ -335,15 +336,12 @@ class AddWordScreen extends React.Component {
     }
 }
 
-class KeyboardBar extends React.Component {
-
-    render() {
+KeyboardBar = (props) => {
         return(
             <View style={{borderTopWidth: 1, borderColor: '#f4f7f8', height: 50, alignItems: 'center', paddingHorizontal: 20}}>
-                {this.props.renderContent}
+                {props.renderContent}
             </View>
         )
-    }
 }
 
 export default AddWordScreen;

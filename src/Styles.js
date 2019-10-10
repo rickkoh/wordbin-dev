@@ -5,7 +5,7 @@ import { getStatusBarHeight } from 'react-native-status-bar-height';
 
 export const colors = {
     default: {
-        backgroundColor: 'white',
+        backgroundColor: '#fefefe',
         primaryColor: 'black',
         secondaryColor: 'darkgray',
         tertiaryColor: 'lightgray',
