@@ -1,19 +1,33 @@
 import React from 'react';
-import { View, Text, FlatList, ScrollView, ListView } from 'react-native';
+import { View, DeviceEventEmitter, Text, FlatList } from 'react-native';
+import { withNavigation } from 'react-navigation';
 
 import { colors } from '../Styles';
 
-import HorizontalList from './HorizontalList';
-
 import Tag from './Tag';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import database from '../services/Database';
 
 class WordCard extends React.Component {
-    render() {
 
-    temp_tags = [{text: "Tags: "}, {text: "English"}, {text: "Language"}, {text: "Fundamentals"}];
+    render() {
         
+        if (this.props.word.Tags.length > 0 && this.props.word.Tags[0].tag_title != 'Tags: ') {
+            this.props.word.Tags.unshift({tag_title: 'Tags: '})
+        }
+
         return(
+            <TouchableOpacity onPress={() => console.log('hey')}>
                 <View style={{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 5, borderWidth: 1, borderColor: colors.default.lightgray}}>
+                    <View style={{alignItems: 'flex-end'}}>
+                        <TouchableOpacity style={{marginLeft: 10, marginRight: 5}} onPress={() => {
+                            database.deleteWord(this.props.word.word_id,
+                                (errorMessage) => console.log(errorMessage),
+                                (success) => DeviceEventEmitter.emit('database_changed'));
+                        }}>
+                            <Text style={{fontWeight: 'bold'}}>. . .</Text>
+                        </TouchableOpacity>
+                    </View>
                     <Text style={{fontSize: 20, marginBottom: 5 }}>{this.props.word.word_text}</Text>
                     {this.props.word.word_pronunciation == undefined ? null : (
                         <Text style={{fontSize: 12, marginBottom: 5 }}>{this.props.word.word_pronunciation}</Text>
@@ -25,13 +39,14 @@ class WordCard extends React.Component {
                         listKey={(item, index) => index.toString()}
                     />
                     <FlatList
-                        data={temp_tags}
+                        data={this.props.word.Tags}
                         style={{flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center'}}
                         renderItem={this.renderTag} 
                         keyExtractor={(item, index) => index.toString()}
                         listKey={(item, index) => index.toString()}
                     />
                 </View>
+            </TouchableOpacity>
         )
     }
 
@@ -39,6 +54,9 @@ class WordCard extends React.Component {
         synonym = [{text: "Synonyms:"}]
         return(
             <View>
+                {item.meaning_classification == undefined ? null : (
+                    <Text style={{fontSize: 12, marginBottom: 5, color: 'gray'}}>{item.meaning_classification}</Text>
+                )}
                 <Text style={{fontSize: 14, marginBottom: 7.5 }}>{item.meaning_text}</Text>
                 {synonym.length <= 1 ? null : (
                     <FlatList
@@ -57,40 +75,16 @@ class WordCard extends React.Component {
         if (index==0) {
             return (
                 <View style={{marginRight: 5, marginBottom: 10}}>
-                    <Text style={{fontSize: 12, color: 'green'}}>{item.text}</Text>
+                    <Text style={{fontSize: 12, color: 'green'}}>{item.tag_title}</Text>
                 </View>
             )
         } else {
             return (
-                <Tag value={item.text}/>
+                <Tag value={item.tag_title}/>
             )
         }
-    }
+    }    
+    
 }
 
-class MeaningItem extends React.Component {
-    render() {
-        return(
-            <View>
-                <Text style={{fontSize: 14, marginBottom: 7.5 }}>{this.prop.item.meaning_text}</Text>
-                <FlatList
-                    data={this.prop.item.Synonyms}
-                    style={{flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center'}}
-                    renderItem={this.renderTag} 
-                    keyExtractor={(item, index) => index.toString()}
-                    listKey={(item, index) => index.toString()}
-                />
-            </View>
-        )
-    }
-}
-
-class TagItem extends React.Component {
-    render() {
-        return(
-            null
-        )
-    }
-}
-
-export default WordCard;
+export default withNavigation(WordCard);

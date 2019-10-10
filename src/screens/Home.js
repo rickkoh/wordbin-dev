@@ -1,10 +1,8 @@
 import React from 'react';
-import { Text, TextInput, View, TouchableOpacity, FlatList, DeviceEventEmitter, ListView } from 'react-native';
+import { Text, View, TouchableOpacity, DeviceEventEmitter } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { SQLite } from 'expo-sqlite';
 
 import { headerStyles, colors } from '../Styles';
-import { SCREEN_WIDTH } from '../Measurements';
 
 import Header from '../components/Header';
 import WordBrowser from '../components/WordBrowser';
@@ -19,8 +17,8 @@ export default class HomeScreen extends React.Component {
 
         this.state = {
         }
-        console.disableYellowBox = true;
 
+        console.disableYellowBox = true;
     }
 
     componentWillMount() {
@@ -103,12 +101,7 @@ export default class HomeScreen extends React.Component {
     }
 
     test = () => {
-        database.getTags(
-            (errorMessage) => console.log(errorMessage),
-            (data) => {
-                console.log(data);
-            }
-        )
+        console.log(this.state);
     }
 
     // Render
@@ -138,10 +131,11 @@ export default class HomeScreen extends React.Component {
                     }
                 />
                 <WordBrowser
+                    onCardPress={() => this.props.navigation.navigate('AddWord')}
                     data={this.state.Words}
                 />
                 <AddActionButton
-                    onPress={() => this.props.navigation.navigate('AddWord', { updateDatabase: this.updateDatabase })}
+                    onPress={() => this.props.navigation.navigate('AddWord')}
                 />
             </View>
         )

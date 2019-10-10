@@ -36,7 +36,9 @@ class MeaningForm extends React.Component {
 
     scrollToIndex = (index, animated) => {
         // Scroll to index
-        this.flatList.scrollToIndex({animated: animated, index: index});
+        if (index > -1 && index < this.props.data.length) {
+            this.flatList.scrollToIndex({animated: animated, index: index});
+        }
     }
 
     onViewableItemsChanged = ({ viewableItems }) => {

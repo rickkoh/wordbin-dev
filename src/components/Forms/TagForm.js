@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TextInput, Text, FlatList } from 'react-native';
+import { View, StyleSheet, TextInput, Text, FlatList } from 'react-native';
 
 import ClearButton from '../ClearButton';
 
@@ -8,14 +8,9 @@ import { SCREEN_WIDTH } from '../../Measurements';
 class TagForm extends React.Component {
     constructor(props) {
         super(props);
-    }
-
-    tagTextInputStyle = () => {
-        return {
-            height: 40,
-            paddingHorizontal: 20,
-            fontSize: 16,
-        }
+        
+        // Available props
+        // Tags 
     }
 
     scrollToIndex = (index, animated) => {
@@ -23,6 +18,7 @@ class TagForm extends React.Component {
     }
 
     renderTagList = () => {
+        // Starts with tag_title: undefined
         data = [...this.props.data];
         data.splice(data.length-1);
         return(
@@ -56,7 +52,7 @@ class TagForm extends React.Component {
         return(
             <View style={{ maxHeight: 160 }}>
                 <TextInput
-                    style={this.tagTextInputStyle()}
+                    style={styles.textInput}
                     value={this.props.value}
                     placeholder="Tags"
                     onChangeText={(text) => this.props.onChangeText(text)}
@@ -68,5 +64,13 @@ class TagForm extends React.Component {
         )
     }
 }
+
+const styles = StyleSheet.create({
+    textInput: {
+        height: 40,
+        paddingHorizontal: 20,
+        fontSize: 16,
+    }
+})
 
 export default TagForm;

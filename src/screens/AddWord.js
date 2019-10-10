@@ -128,7 +128,6 @@ class AddWordScreen extends React.Component {
         if (text != undefined && text.length>0) {
             tags = tags.concat({tag_title: undefined});
             this.setState({ tags: tags });
-            console.log(this.state);
         }
     }
 
@@ -139,34 +138,110 @@ class AddWordScreen extends React.Component {
     }
 
     addButtonPressed = () => {
-        database.addWord(this.state.word,
-            (errorMessage) => console.log(errorMessage),
-            (word_id) => {
 
-                if (this.state.tags.length > 0) {
-                    database.addTags(
-                        this.state.tags,
-                        (errorMessage) => {},
-                        () => {
-                            console.log('tags added');
-                        });
+        word_id = undefined;
+
+        start = () => {
+            addWord();
+        }
+
+        addWord = () => {
+            database.addWord(this.state.word,
+                () => {
+                    fail();
+                },
+                (new_word_id) => {
+                    word_id = new_word_id;
+                    pass();
                 }
+            );
 
-                if (this.state.meaning.length > 0) {
-                    database.addMeanings(word_id,
-                        this.state.meaning,
-                        (errorMessage) => complete(),
-                        () => {
-                            complete();
-                        });
-                } else {
-                    complete();
-                }
-        });
+            function fail() {
+                navigateBack();
+            }
 
-        complete = () => {
+            function pass() {
+                addMeaning();
+            }
+        }
+
+        addMeaning = () => {
+            if (this.state.meaning.length > 0) {
+                database.addMeanings(word_id, this.state.meaning,
+                    () => {
+                        fail();
+                    },
+                    (success) => {
+                        pass();
+                    }
+                );
+            } else {
+                fail();
+            }
+
+            function fail() {
+                addTags();
+            }
+
+            function pass() {
+                addTags();
+            }
+        }
+
+        addTags = () => {
+
+            tags = this.state.tags.splice(0, this.state.tags.length - 1);
+
+            if (tags.length > 0) {
+                tags.forEach(async (tag, index) => {
+                    database.getTag(tag.tag_title,
+                        () => fail(),
+                        (data) => {
+                            if (data.length > 0) {
+                                tag_id = data[0].tag_id;
+                                link(tag_id, index);
+                            } else {
+                                database.addTag(tag,
+                                    (errorMessage) => console.log(errorMessage),
+                                    (new_tag_id) => {
+                                        tag_id = new_tag_id
+                                        link(tag_id, index);
+                                    }
+                                )
+                            }
+                        }
+                    );
+                });
+            } else {
+                fail();
+            }
+
+            function link(tag_id, index) {
+                console.log('linking word ' + word_id + ' and ' + tag_id);
+                database.addWordTag(word_id, tag_id,
+                    (errorMessage) => {
+                        if (index == tags.length - 1) pass();
+                    },
+                    (success) => {
+                        if (success) pass();
+                    }
+                )
+            }
+
+            function fail() {
+                navigateBack();
+            }
+
+            function pass() {
+                navigateBack();
+            }
+        }
+
+        navigateBack = () => {
             this.props.navigation.goBack();
         }
+
+        start();
     }
 
     // convert this to a component

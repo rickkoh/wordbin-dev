@@ -1,5 +1,6 @@
 import React from 'react'
 import { FlatList } from 'react-native';
+import { withNavigation } from 'react-navigation';
 
 import WordCard from './WordCard';
 
@@ -11,11 +12,11 @@ class WordBrowser extends React.Component {
             <FlatList
                 data={this.props.data}
                 contentContainerStyle={{justifyContent: 'center'}}
-                renderItem={({item}) => <WordCard word={item}/>}
+                renderItem={({item}) => <WordCard word={item} onCardPress={this.props.onCardPress}/>}
                 keyExtractor={(item, index) => index.toString()}
             />
         )
     }
 }
 
-export default WordBrowser;
+export default withNavigation(WordBrowser);

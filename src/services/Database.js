@@ -1,6 +1,8 @@
 import { SQLite } from 'expo-sqlite';
 import * as FileSystem from 'expo-file-system';
 
+// After running a query, an object containing the information should be returned.
+
 const DATABASE_NAME = 'db.db';
 
 const Word = {
@@ -117,7 +119,11 @@ const CREATE_WORDSYNONYM_TABLE = "CREATE TABLE " + WordSynonym.TABLE + " (" +
 
 const INSERT_WORD_QUERY = "INSERT INTO " + Word.TABLE + " (" + Word.COLUMN_TEXT + ", " + Word.COLUMN_PRONUNCIATION + ", " + Word.COLUMN_ORIGIN + ", " + Word.COLUMN_DATETIMEADDED + ") VALUES (?, ?, ?, datetime('now'))";
 
+const DELETE_WORD_QUERY = "DELETE FROM " + Word.TABLE + " WHERE " + Word.COLUMN_ID + " = ?";
+
 const INSERT_MEANING_QUERY = "INSERT INTO " + Meaning.TABLE + " (" + Meaning.COLUMN_WORD_ID + ", " + Meaning.COLUMN_TEXT + ", " + Meaning.COLUMN_WORD_CLASSIFICATION + ", " + Meaning.COLUMN_DATETIMECREATED + ") VALUES (?, ?, ?, datetime('now'))";
+
+const DELETE_MEANING_BY_WORD_ID_QUERY = "DELETE FROM " + Meaning.TABLE + " WHERE " + Meaning.COLUMN_WORD_ID + " = ?";
 
 const INSERT_WORDSYNONYM_QUERY = "INSERT INTO " + WordSynonym.TABLE + " (" + WordSynonym.COLUMN_WORD_ID + ", " + WordSynonym.COLUMN_MEANING_ID + ", " + WordSynonym.COLUMN_DATETIMELINKED + ") VALUES (?, ?, datetime('now'))";
 
@@ -138,6 +144,8 @@ const SELECT_ALL_MEANING_QUERY = "SELECT * FROM " + Meaning.TABLE + " WHERE " + 
 const SELECT_ALL_SERIES_QUERY = "SELECT * FROM " + Series.TABLE;
 
 const SELECT_ALL_TAGS_QUERY = "SELECT * FROM " + Tag.TABLE;
+
+const SELECT_TAGS_QUERY = "SELECT * FROM " + Tag.TABLE + " WHERE " + Tag.COLUMN_TITLE + " = ?";
 
 const SELECT_ALL_SERIESWORD_QUERY = "SELECT * FROM " + Word.TABLE + " INNER JOIN " + WordSeries.TABLE + " ON " + Word.COLUMN_ID + " = " + WordSeries.COLUMN_WORD_ID + " WHERE " + WordSeries.COLUMN_SERIES_ID + " = ?";
 
@@ -233,10 +241,35 @@ class Database {
         });
     }
 
-    addMeanings = (word_id, meaning_array, error_callback, success_callback) => {
-        meaning_array.forEach(async (meaning) => {
-            this.addMeaning(word_id, meaning, error_callback, success_callback);
+    deleteWord = (word_id, error_callback, success_callback) => {
+        db.transaction(tx => {
+            tx.executeSql(
+                DELETE_WORD_QUERY,
+                [word_id],
+                (null)
+            )
+        }, error => {
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
+        }, success => {
+            try {
+                this.deleteMeaningByWordId(word_id);
+                success_callback(true);
+            } catch (error) {
+                console.log(error);
+            }
         });
+    }
+
+    addMeanings = (word_id, meaning_array, error_callback, success_callback) => {
+        if (meaning_array.length > 0) {
+            meaning_array.forEach(async (meaning) => {
+                this.addMeaning(word_id, meaning, error_callback, success_callback);
+            });
+        }
     }
 
     addMeaning = (word_id, meaning, error_callback, success_callback) => {
@@ -256,6 +289,28 @@ class Database {
         }, success => {
             try {
                 success_callback(meaning_id);
+            } catch (error) {
+                console.log(error);
+            }
+        });
+    }
+
+    deleteMeaningByWordId = (word_id, error_callback, success_callback) => {
+        db.transaction(tx => {
+            tx.executeSql(
+                DELETE_MEANING_BY_WORD_ID_QUERY,
+                [word_id],
+                (null)
+            )
+        }, error => {
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
+        }, success => {
+            try {
+                success_callback(true);
             } catch (error) {
                 console.log(error);
             }
@@ -290,7 +345,7 @@ class Database {
             tx.executeSql(
                 INSERT_WORDSERIES_QUERY,
                 [word_id, series_id],
-                (_)
+                (null)
             )
         }, error => {
             try {
@@ -314,11 +369,12 @@ class Database {
     }
 
     addTag = (tag, error_callback, success_callback) => {
+        tag_id = undefined;
         db.transaction(tx => {
             tx.executeSql(
                 INSERT_TAG_QUERY,
                 [tag.tag_title],
-                (null)
+                (_, { insertId }) => tag_id = insertId
             );
         }, error => {
             try{
@@ -328,7 +384,7 @@ class Database {
             }
         }, success => {
             try {
-                success_callback(true);
+                success_callback(tag_id);
             } catch (error) {
                 console.log(error);
             }
@@ -346,7 +402,7 @@ class Database {
             tx.executeSql(
                 INSERT_WORDTAG_QUERY,
                 [word_id, tag_id],
-                (_)
+                (null)
             );
         }, error => {
             try {
@@ -432,6 +488,29 @@ class Database {
         });
     }
 
+    getTag = (tag_title, error_callback, success_callback) => {
+        result = undefined;
+        db.transaction(tx => {
+            tx.executeSql(
+                SELECT_TAGS_QUERY,
+                [tag_title],
+                (_, {rows: { _array } }) => result = _array
+            )
+        }, error => {
+            try {
+                error_callback(error);
+            } catch (error) {
+                console.log(error);
+            }
+        }, success => {
+            try {
+                success_callback(result);
+            } catch (error) {
+                console.log(error);
+            }
+        });
+    }
+
     getTags = (error_callback, success_callback) => {
         result = undefined;
         db.transaction(tx => {
@@ -448,8 +527,7 @@ class Database {
             }
         }, success => {
             try {
-                console.log(result);
-                success_callback(result)
+                success_callback(result);
             } catch (error) {
                 console.log(error);
             }
