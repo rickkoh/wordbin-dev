@@ -40,7 +40,7 @@ class TagForm extends React.Component {
                     <Text style={{padding: 5, paddingRight: 0}}>{item.tag_title}</Text>
                     <ClearButton
                         color='lightgray'
-                        onPress={() => {this.props.onPress(index); this.textInput.focus()}}
+                        onPress={() => this.props.onPress(index)}
                     />
                 </View>
                 <TextInput style={{margin: 2, minWidth: 5}}/>
@@ -52,7 +52,6 @@ class TagForm extends React.Component {
         return(
             <View style={{ maxHeight: 160 }}>
                 <TextInput
-                    ref={(ref) => this.textInput = ref}
                     style={styles.textInput}
                     value={this.props.value}
                     placeholder="Tags"

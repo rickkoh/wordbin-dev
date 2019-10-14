@@ -11,11 +11,11 @@ import database from '../services/Database';
 
 export default class HomeScreen extends React.Component {
 
-    // Constructor
     constructor(props) {
         super(props);
 
         this.state = {
+            title: 'Home'
         }
 
         console.disableYellowBox = true;
@@ -23,6 +23,7 @@ export default class HomeScreen extends React.Component {
 
     componentWillMount() {
         DeviceEventEmitter.addListener("database_changed", () => this.refreshData());
+        DeviceEventEmitter.addListener("change_title", (title) => this.setState({title: title}));
     }
 
     componentDidMount() {
@@ -30,6 +31,7 @@ export default class HomeScreen extends React.Component {
     }
 
     refreshData = () => {
+        console.log('data refreshed');
         this.loadData((data) => this.setState(data));
     }
 
@@ -38,24 +40,31 @@ export default class HomeScreen extends React.Component {
         entire_database = {};
 
         loadWords = () => {
-            try {
-                database.getWords(
-                    (errorMessage) => console.log(errorMessage),
-                    (data) => { 
-                        entire_database.Words = data;
-                        loadMeanings();
-                    }
-                );
-            } catch {
-                console.log("error");
+            database.getWords(
+                (error) => console.log(error),
+                (data) => { 
+                    entire_database.Words = data;
+                    loaded();
+                }
+            );
+
+            function loaded() {
+                loadMeanings();
+            }
+
+            function failed() {
+
             }
         }
 
         loadMeanings = () => {
-            try {
+            if (entire_database.Words.length > 0) {
                 entire_database.Words.forEach(async (word, word_index) => {
+
+                    last = false;
+
                     database.getMeanings(word.word_id,
-                        (errorMessage) => console.log(errorMessage),
+                        (error) => console.log(error),
                         (data) => {
                             entire_database.Words[word_index].Meanings = data;
                             loadSynonyms(word_index);
@@ -63,30 +72,85 @@ export default class HomeScreen extends React.Component {
                     );
 
                     database.getWordTags(word.word_id,
-                        (errorMessage) => console.log(errorMessage),
+                        (error) => console.log(error),
                         (data) => {
                             entire_database.Words[word_index].Tags = data;
                         })
                 });
-            } catch {
-                console.log("error");
+            } else {
+                complete();
             }
         }
 
         loadSynonyms = (word_index) => {
+            entire_database.Words[word_index].Meanings.forEach(async (meaning, meaning_index) => {
+                database.getWordSynonym(meaning.meaning_id,
+                    (error) => console.log(error),
+                    (data) => {
+                        entire_database.Words[word_index].Meanings[meaning_index].Synonyms = data;
+                        if (word_index == entire_database.Words.length-1 && meaning_index == entire_database.Words[word_index].Meanings.length-1) complete();
+                    }
+                )
+            })
+        }
+
+        complete = () => {
             try {
-                entire_database.Words[word_index].Meanings.forEach(async (meaning, meaning_index) => {
-                    database.getWordSynonym(meaning.meaning_id,
-                        (errorMessage) => console.log(errorMessage),
-                        (data) => {
-                            entire_database.Words[word_index].Meanings[meaning_index].Synonyms = data;
-                            if (word_index == entire_database.Words.length-1 && meaning_index == entire_database.Words[word_index].Meanings.length-1) complete();
-                        }
-                    )
-                })
-            } catch {
-                console.log("error");
+                callback(entire_database);
+            } catch (error) {
+                console.log(error);
             }
+        }
+
+        loadWords();
+    }
+
+    loadDatas = (callback) => {
+
+        entire_database = {};
+
+        loadWords = () => {
+            database.getWords(
+                (error) => console.log(error),
+                (data) => { 
+                    entire_database.Words = data;
+                    loadMeanings();
+                }
+            );
+        }
+
+        loadMeanings = () => {
+            if (entire_database.Words.length > 0) {
+                entire_database.Words.forEach(async (word, word_index) => {
+                    database.getMeanings(word.word_id,
+                        (error) => console.log(error),
+                        (data) => {
+                            entire_database.Words[word_index].Meanings = data;
+                            loadSynonyms(word_index);
+                        }
+                    );
+
+                    database.getWordTags(word.word_id,
+                        (error) => console.log(error),
+                        (data) => {
+                            entire_database.Words[word_index].Tags = data;
+                        })
+                });
+            } else {
+                complete();
+            }
+        }
+
+        loadSynonyms = (word_index) => {
+            entire_database.Words[word_index].Meanings.forEach(async (meaning, meaning_index) => {
+                database.getWordSynonym(meaning.meaning_id,
+                    (error) => console.log(error),
+                    (data) => {
+                        entire_database.Words[word_index].Meanings[meaning_index].Synonyms = data;
+                        if (word_index == entire_database.Words.length-1 && meaning_index == entire_database.Words[word_index].Meanings.length-1) complete();
+                    }
+                )
+            })
         }
 
         complete = () => {
@@ -119,7 +183,7 @@ export default class HomeScreen extends React.Component {
                     }
                     headerTitle={
                         <Text style={headerStyles.headerTitle}>
-                            Home
+                            {this.state.title}
                         </Text>
                     }
                     headerRight={

@@ -270,7 +270,7 @@ class AddWordScreen extends React.Component {
                     </TouchableOpacity>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end'}}>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={this.addButtonPressed}>
                         <Icon name='add' color={colors.default.blue}/>
                     </TouchableOpacity>
                 </View>

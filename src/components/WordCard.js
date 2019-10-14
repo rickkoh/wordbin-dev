@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, DeviceEventEmitter, Text, FlatList } from 'react-native';
+import { View, DeviceEventEmitter, StyleSheet, Text, FlatList } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 import { colors } from '../Styles';
@@ -25,7 +25,7 @@ class WordCard extends React.Component {
         this.cleanString();
 
         return(
-            <TouchableOpacity onPress={() => console.log('hey')}>
+            <TouchableOpacity onPress={() => console.log(this.props.word.word_text)}>
                 <View style={{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 10, borderWidth: 1, borderColor: '#e1edf0', backgroundColor: '#fbfdfd'}}>
                     <View style={{alignItems: 'flex-end'}}>
                         <TouchableOpacity style={{marginLeft: 10, marginRight: 5}} onPress={() => {
@@ -81,18 +81,26 @@ class WordCard extends React.Component {
 
     renderTag = ({item, index}) => {
         if (index==0) {
+            // Render tag header
             return (
                 <View style={{marginRight: 5, marginBottom: 10}}>
                     <Text style={{fontSize: 12, color: 'green'}}>{item.tag_title}</Text>
                 </View>
             )
         } else {
+            // Render tag
             return (
-                <Tag value={item.tag_title}/>
+                <TouchableOpacity onPress={() => DeviceEventEmitter.emit("change_title", (item.tag_id))}>
+                    <Tag value={item.tag_title}/>
+                </TouchableOpacity>
             )
         }
     }    
     
 }
+
+const styles = StyleSheet.create({
+    
+})
 
 export default withNavigation(WordCard);

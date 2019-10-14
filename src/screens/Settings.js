@@ -1,10 +1,13 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, DeviceEventEmitter } from 'react-native';
+import { Icon } from 'react-native-elements';
 import * as FileSystem from 'expo-file-system';
+
+import Header from '../components/Header';
 
 import database from '../services/Database';
 
-import { headerStyles } from '../Styles';
+import { colors, headerStyles } from '../Styles';
 
 export default class SettingsScreen extends React.Component {
 
@@ -32,15 +35,19 @@ export default class SettingsScreen extends React.Component {
     render() {
         return(
             <View>
-                <View style={headerStyles.header}>
-                </View>
-                <TouchableOpacity onPress={() => this.populateDatabase()} style={styles.addButton}>
-                    <Text style={{color: "white"}}>Populate Dummy Data</Text>
-                </TouchableOpacity>
+                <Header
+                    headerLeft={
+                        <TouchableOpacity
+                            onPress={() => this.props.navigation.openDrawer()}
+                            style={headerStyles.headerButtonLeft}>
+                            <Icon name='menu' color={colors.default.primaryColor}/>
+                        </TouchableOpacity>
+                    }
+                />
                 <TouchableOpacity onPress={() => this.downloadDictionaryDatabase()} style={styles.addButton}>
                     <Text style={{color: "white"}}>Download Dictionary</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => database.resetDatabase()} style={styles.addButton}>
+                <TouchableOpacity onPress={() => {database.resetDatabase(); DeviceEventEmitter.emit("database_changed")}} style={styles.addButton}>
                     <Text style={{color: "white"}}>Reset Database</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => database.printDatabaseLocation()} style={styles.addButton}>

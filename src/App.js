@@ -1,9 +1,14 @@
 import React from 'react';
-import { createStackNavigator, createDrawerNavigator, createAppContainer } from 'react-navigation';
+import database from './services/Database';
 
 import WordBin from './Router';
 
 export default class App extends React.Component {
+
+    componentDidMount() {
+        database.initializeDatabase();
+    }
+
     render() {
         return <WordBin />
     }

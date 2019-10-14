@@ -43,7 +43,7 @@ const DrawerNavigator = createDrawerNavigator({
             //drawerLabel: 'Add word',
         //},
     //},
-    //Settings: SettingsScreen,
+    Settings: SettingsScreen,
 },
 {
     contentComponent: props => 
