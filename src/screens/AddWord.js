@@ -1,5 +1,5 @@
 import React from 'react';
-import { DeviceEventEmitter, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity, FlatList } from 'react-native';
+import { DeviceEventEmitter, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
 
 import { colors, headerStyles } from '../Styles';

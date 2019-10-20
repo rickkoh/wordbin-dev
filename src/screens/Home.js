@@ -83,6 +83,7 @@ export default class HomeScreen extends React.Component {
         }
 
         loadSynonyms = (word_index) => {
+
             entire_database.Words[word_index].Meanings.forEach(async (meaning, meaning_index) => {
                 database.getWordSynonym(meaning.meaning_id,
                     (error) => console.log(error),

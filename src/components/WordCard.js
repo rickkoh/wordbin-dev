@@ -90,7 +90,7 @@ class WordCard extends React.Component {
         } else {
             // Render tag
             return (
-                <TouchableOpacity onPress={() => DeviceEventEmitter.emit("change_title", (item.tag_id))}>
+                <TouchableOpacity onPress={() => DeviceEventEmitter.emit("change_title", (item.tag_title))}>
                     <Tag value={item.tag_title}/>
                 </TouchableOpacity>
             )
