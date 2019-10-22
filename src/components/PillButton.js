@@ -24,6 +24,8 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         borderRadius: 25,
         backgroundColor: colors.default.blue,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     enabled: {
         opacity: 1,

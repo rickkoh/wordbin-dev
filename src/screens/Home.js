@@ -8,6 +8,7 @@ import Header from '../components/Header';
 import WordBrowser from '../components/WordBrowser';
 import AddActionButton from '../components/AddActionButton';
 import database from '../services/Database';
+import PillButton from '../components/PillButton';
 
 export default class HomeScreen extends React.Component {
 
@@ -15,7 +16,10 @@ export default class HomeScreen extends React.Component {
         super(props);
 
         this.state = {
-            title: 'Home'
+            title: 'Home',
+            Words: [],
+            Meanings: [],
+            Synonyms: [],
         }
 
         console.disableYellowBox = true;
@@ -35,138 +39,156 @@ export default class HomeScreen extends React.Component {
         this.loadData((data) => this.setState(data));
     }
 
-    loadData = (callback) => {
+    loadData = async (callback) => {
 
-        entire_database = {};
+        async function asyncForEach(array, callback) {
+            for (let index = 0; index < array.length; index++) {
+                await callback(array[index], index, array);
+            }
+        }
+
+        entire_database = { };
+
+        start = async () => {
+            await loadWords().then(async () => {
+                await asyncForEach(entire_database.Words, async (word, windex) => {
+                    console.log("word index: " + windex);
+                    await loadWordTags(word.word_id, windex);
+                    await loadMeanings(word.word_id, windex).then(async () => {
+                        await asyncForEach(entire_database.Words[windex].Meanings, async (meaning, index) => {
+                            console.log(windex);
+                            await loadSynonyms(meaning.meaning_id, index, windex);
+                        })
+                    });
+                })
+            }).then(() => callback(entire_database));
+        }
 
         loadWords = () => {
-            database.getWords(
-                (error) => console.log(error),
-                (data) => { 
+            return new Promise((resolve, reject) => {
+                database.getWordss()
+                .then(data => {
                     entire_database.Words = data;
-                    loaded();
-                }
-            );
-
-            function loaded() {
-                loadMeanings();
-            }
-
-            function failed() {
-
-            }
+                    resolve();
+                })
+            })
         }
 
-        loadMeanings = () => {
-            if (entire_database.Words.length > 0) {
-                entire_database.Words.forEach(async (word, word_index) => {
-
-                    last = false;
-
-                    database.getMeanings(word.word_id,
-                        (error) => console.log(error),
-                        (data) => {
-                            entire_database.Words[word_index].Meanings = data;
-                            loadSynonyms(word_index);
-                        }
-                    );
-
-                    database.getWordTags(word.word_id,
-                        (error) => console.log(error),
-                        (data) => {
-                            entire_database.Words[word_index].Tags = data;
-                        })
-                });
-            } else {
-                complete();
-            }
-        }
-
-        loadSynonyms = (word_index) => {
-
-            entire_database.Words[word_index].Meanings.forEach(async (meaning, meaning_index) => {
-                database.getWordSynonym(meaning.meaning_id,
-                    (error) => console.log(error),
+        loadWordTags = (word_id, index) => {
+            return new Promise((resolve, reject) => {
+                database.getWordTags(word_id, null,
                     (data) => {
-                        entire_database.Words[word_index].Meanings[meaning_index].Synonyms = data;
-                        if (word_index == entire_database.Words.length-1 && meaning_index == entire_database.Words[word_index].Meanings.length-1) complete();
+                        entire_database.Words[index].Tags = data;
+                        resolve();
+                    }
+                );
+            })
+        }
+
+        loadMeanings = (word_id, index) => {
+            return new Promise((resolve, reject) => {
+                database.getMeaningss(word_id)
+                .then(data => {
+                    entire_database.Words[index].Meanings = data;
+                    resolve();
+                });
+            })
+        }
+
+        loadSynonyms = (meaning_id, index, windex) => {
+            return new Promise((resolve, reject) => {
+                database.getWordSynonym(meaning_id, null,
+                    (data) => {
+                        entire_database.Words[windex].Meanings[index].Synonyms = data;
+                        resolve();
                     }
                 )
             })
         }
 
-        complete = () => {
-            try {
-                callback(entire_database);
-            } catch (error) {
-                console.log(error);
-            }
-        }
-
-        loadWords();
+        start();
     }
 
-    loadDatas = (callback) => {
+    loadDatas = async (callback) => {
 
-        entire_database = {};
-
-        loadWords = () => {
-            database.getWords(
-                (error) => console.log(error),
-                (data) => { 
-                    entire_database.Words = data;
-                    loadMeanings();
-                }
-            );
-        }
-
-        loadMeanings = () => {
-            if (entire_database.Words.length > 0) {
-                entire_database.Words.forEach(async (word, word_index) => {
-                    database.getMeanings(word.word_id,
-                        (error) => console.log(error),
-                        (data) => {
-                            entire_database.Words[word_index].Meanings = data;
-                            loadSynonyms(word_index);
-                        }
-                    );
-
-                    database.getWordTags(word.word_id,
-                        (error) => console.log(error),
-                        (data) => {
-                            entire_database.Words[word_index].Tags = data;
-                        })
-                });
-            } else {
-                complete();
+        // Create an asynchronous for loop function
+        async function asyncForEach(array, callback) {
+            for (let index = 0; index < array.length; index++) {
+                await callback(array[index], index, array);
             }
         }
 
-        loadSynonyms = (word_index) => {
-            entire_database.Words[word_index].Meanings.forEach(async (meaning, meaning_index) => {
-                database.getWordSynonym(meaning.meaning_id,
-                    (error) => console.log(error),
+        entire_database = {
+            Words: [],
+            Meanings: [],
+            Synonyms: [],
+            Tags: [],
+        };
+
+        start = async () => {
+            await loadWords().then(async () => {
+                await asyncForEach(entire_database.Words, async (word) => {
+                    await loadWordTags(word.word_id);
+                    await loadMeanings(word.word_id).then(async () => {
+                        await asyncForEach(entire_database.Meanings, async (meaning) => {
+                            await loadSynonyms(meaning.meaning_id);
+                        })
+                    });
+                })
+            }).then(() => console.log(entire_database));
+        }
+
+        loadWords = () => {
+            return new Promise((resolve, reject) => {
+                database.getWordss()
+                .then(data => {
+                    entire_database.Words = data;
+                    resolve();
+                })
+            })
+        }
+
+        loadWordTags = (word_id) => {
+            return new Promise((resolve, reject) => {
+                database.getWordTags(word_id, null,
                     (data) => {
-                        entire_database.Words[word_index].Meanings[meaning_index].Synonyms = data;
-                        if (word_index == entire_database.Words.length-1 && meaning_index == entire_database.Words[word_index].Meanings.length-1) complete();
+                        entire_database.Tags = entire_database.Tags.concat(data);
+                        resolve();
+                    }
+                );
+            })
+        }
+
+        loadMeanings = (word_id) => {
+            return new Promise((resolve, reject) => {
+                database.getMeaningss(word_id)
+                .then(data => {
+                    entire_database.Meanings = entire_database.Meanings.concat(data);
+                    resolve();
+                });
+            })
+        }
+
+        loadSynonyms = (meaning_id) => {
+            return new Promise((resolve, reject) => {
+                database.getWordSynonym(meaning_id, null,
+                    (data) => {
+                        entire_database.Synonyms = entire_database.Synonyms.concat(data);
+                        resolve();
                     }
                 )
             })
         }
 
-        complete = () => {
-            try {
-                callback(entire_database);
-            } catch (error) {
-                console.log(error);
-            }
+        fianlFunc = (data) => {
+            console.log(data)
         }
 
-        loadWords();
+        start();
     }
 
     test = () => {
-        console.log(this.state);
+        this.loadDatas((data) => console.log(data));
     }
 
     // Render
@@ -195,10 +217,19 @@ export default class HomeScreen extends React.Component {
                         </TouchableOpacity>
                     }
                 />
-                <WordBrowser
+                {this.state.Words == undefined || this.state.Words.length <= 0 ?
+                (<View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                    <TouchableOpacity
+                        text="Add Your First Word"
+                        onPress={() => this.props.navigation.navigate('AddWord')}
+                    >
+                        <Text style={{color: colors.default.blue, fontSize: 16, marginBottom: 100}}>Add Your First Word</Text>
+                    </TouchableOpacity>
+                </View>) :
+                (<WordBrowser
                     onCardPress={() => this.props.navigation.navigate('AddWord')}
                     data={this.state.Words}
-                />
+                />)}
                 <AddActionButton
                     onPress={() => this.props.navigation.navigate('AddWord')}
                 />

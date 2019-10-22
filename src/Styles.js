@@ -11,8 +11,9 @@ export const colors = {
         tertiaryColor: 'lightgray',
         blue: '#41a4ea',
         red: '#e74c3c',
+        lightred: '#e86e6e',
         gray: '#d2d2d8',
-        lightgray: '#f0f0f0',
+        lightgray: '#DFE1E5',
     },
 }
 

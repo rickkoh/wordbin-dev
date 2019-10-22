@@ -1,6 +1,7 @@
 // Import modules
 import { SQLite } from 'expo-sqlite';
 import * as FileSystem from 'expo-file-system';
+import { normalize, schema } from 'normalizr'; 
 
 // Import models
 import Word from '../models/Word';
@@ -14,6 +15,8 @@ import WordSynonym from '../models/WordSynonym';
 const DATABASE_NAME = 'db.db';
 
 db = SQLite.openDatabase(DATABASE_NAME);
+
+// TODO: Convert all functions to use Promises (Functions are currently using callbacks)
 
 class Database {
 
@@ -337,6 +340,23 @@ class Database {
         });
     }
 
+    getWordss = () => {
+        return new Promise((resolve, reject) => {
+            result = undefined;
+            db.transaction(tx => {
+                tx.executeSql(
+                    Word.Query.SELECT_ALL_WORD_QUERY,
+                    [],
+                    (_, {rows: { _array } }) => result = _array 
+                );
+            }, error => {
+                reject(error);
+            }, success => {
+                resolve(result);
+            });
+        })
+    }
+
     getMeanings = (word_id, error_callback, success_callback) => {
         result = undefined;
         db.transaction(tx => {
@@ -358,6 +378,23 @@ class Database {
                 console.log(error);
             }
         });
+    }
+
+    getMeaningss = (word_id) => {
+        return new Promise((resolve, reject) => {
+            result = undefined;
+            db.transaction(tx => {
+                tx.executeSql(
+                    Meaning.Query.SELECT_ALL_MEANING_QUERY,
+                    [word_id],
+                    (_, {rows: { _array } }) => result = _array 
+                );
+            }, error => {
+                reject(error);
+            }, success => {
+                resolve(result);
+            });
+        })
     }
 
     getSeries = (error_callback, success_callback) => {

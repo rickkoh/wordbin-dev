@@ -47,7 +47,7 @@ const DrawerNavigator = createDrawerNavigator({
 },
 {
     contentComponent: props => 
-        <View style={{paddingTop: 44}}>
+        <View style={{paddingTop: 44, flex: 1}}>
             <DrawerItems {...props} />
             <SideMenu/>
         </View>
