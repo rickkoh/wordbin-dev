@@ -36,10 +36,10 @@ export default class HomeScreen extends React.Component {
 
     refreshData = () => {
         console.log('data refreshed');
-        this.loadData((data) => this.setState(data));
+        this.loadData().then((data) => this.setState(data));
     }
 
-    loadData = async (callback) => {
+    loadData = () => {
 
         async function asyncForEach(array, callback) {
             for (let index = 0; index < array.length; index++) {
@@ -47,148 +47,33 @@ export default class HomeScreen extends React.Component {
             }
         }
 
-        entire_database = { };
+        entities = {}
 
-        start = async () => {
-            await loadWords().then(async () => {
-                await asyncForEach(entire_database.Words, async (word, windex) => {
-                    console.log("word index: " + windex);
-                    await loadWordTags(word.word_id, windex);
-                    await loadMeanings(word.word_id, windex).then(async () => {
-                        await asyncForEach(entire_database.Words[windex].Meanings, async (meaning, index) => {
-                            console.log(windex);
-                            await loadSynonyms(meaning.meaning_id, index, windex);
+        return new Promise(async (resolve, reject) => {
+            await database.getWordss().then(async data => {
+                entities.Words = data;
+                await asyncForEach(data, async (word, word_index) => {
+                    await database.getWordTagss(word.word_id).then(async data => {
+                        entities.Words[word_index].Tags = data;
+                    })
+                    await database.getMeaningss(word.word_id).then(async data => {
+                        entities.Words[word_index].Meanings = data;
+                        await asyncForEach(data, async (meaning, meaning_index) => {
+                            await database.getWordSynonyms(meaning.meaning_id).then(async data => {
+                                entities.Words[word_index].Meanings[meaning_index].Synonyms = data;
+                            })
                         })
-                    });
+                    })
                 })
-            }).then(() => callback(entire_database));
-        }
 
-        loadWords = () => {
-            return new Promise((resolve, reject) => {
-                database.getWordss()
-                .then(data => {
-                    entire_database.Words = data;
-                    resolve();
-                })
-            })
-        }
-
-        loadWordTags = (word_id, index) => {
-            return new Promise((resolve, reject) => {
-                database.getWordTags(word_id, null,
-                    (data) => {
-                        entire_database.Words[index].Tags = data;
-                        resolve();
-                    }
-                );
-            })
-        }
-
-        loadMeanings = (word_id, index) => {
-            return new Promise((resolve, reject) => {
-                database.getMeaningss(word_id)
-                .then(data => {
-                    entire_database.Words[index].Meanings = data;
-                    resolve();
-                });
-            })
-        }
-
-        loadSynonyms = (meaning_id, index, windex) => {
-            return new Promise((resolve, reject) => {
-                database.getWordSynonym(meaning_id, null,
-                    (data) => {
-                        entire_database.Words[windex].Meanings[index].Synonyms = data;
-                        resolve();
-                    }
-                )
-            })
-        }
-
-        start();
-    }
-
-    loadDatas = async (callback) => {
-
-        // Create an asynchronous for loop function
-        async function asyncForEach(array, callback) {
-            for (let index = 0; index < array.length; index++) {
-                await callback(array[index], index, array);
-            }
-        }
-
-        entire_database = {
-            Words: [],
-            Meanings: [],
-            Synonyms: [],
-            Tags: [],
-        };
-
-        start = async () => {
-            await loadWords().then(async () => {
-                await asyncForEach(entire_database.Words, async (word) => {
-                    await loadWordTags(word.word_id);
-                    await loadMeanings(word.word_id).then(async () => {
-                        await asyncForEach(entire_database.Meanings, async (meaning) => {
-                            await loadSynonyms(meaning.meaning_id);
-                        })
-                    });
-                })
-            }).then(() => console.log(entire_database));
-        }
-
-        loadWords = () => {
-            return new Promise((resolve, reject) => {
-                database.getWordss()
-                .then(data => {
-                    entire_database.Words = data;
-                    resolve();
-                })
-            })
-        }
-
-        loadWordTags = (word_id) => {
-            return new Promise((resolve, reject) => {
-                database.getWordTags(word_id, null,
-                    (data) => {
-                        entire_database.Tags = entire_database.Tags.concat(data);
-                        resolve();
-                    }
-                );
-            })
-        }
-
-        loadMeanings = (word_id) => {
-            return new Promise((resolve, reject) => {
-                database.getMeaningss(word_id)
-                .then(data => {
-                    entire_database.Meanings = entire_database.Meanings.concat(data);
-                    resolve();
-                });
-            })
-        }
-
-        loadSynonyms = (meaning_id) => {
-            return new Promise((resolve, reject) => {
-                database.getWordSynonym(meaning_id, null,
-                    (data) => {
-                        entire_database.Synonyms = entire_database.Synonyms.concat(data);
-                        resolve();
-                    }
-                )
-            })
-        }
-
-        fianlFunc = (data) => {
-            console.log(data)
-        }
-
-        start();
+                // Async test: Done should be called before entities obj is returned
+                // console.log('Done');
+            }).then(() => resolve(entities))
+        })
     }
 
     test = () => {
-        this.loadDatas((data) => console.log(data));
+        this.loadData().then((data) => console.log(data));
     }
 
     // Render

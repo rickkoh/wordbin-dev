@@ -420,7 +420,7 @@ class Database {
         });
     }
 
-    getTag = (tag_title, error_callback, success_callback) => {
+    etTag = (tag_title, error_callback, success_callback) => {
         result = undefined;
         db.transaction(tx => {
             tx.executeSql(
@@ -464,6 +464,23 @@ class Database {
                 console.log(error);
             }
         });
+    }
+
+    getTagss = () => {
+        return new Promise((resolve, reject) => {
+            result = undefined;
+            db.transaction(tx => {
+                tx.executeSql(
+                    Tag.Query.SELECT_ALL_TAGS_QUERY,
+                    [],
+                    (_, {rows: { _array } }) => result = _array 
+                );
+            }, error => {
+                reject(error);
+            }, success => {
+                resolve(result);
+            });
+        })
     }
 
     getSeriesWords = (series_id, error_callback, success_callback) => {
@@ -535,6 +552,23 @@ class Database {
         })
     }
 
+    getWordTagss = (word_id) => {
+        return new Promise((resolve, reject) => {
+            result = undefined;
+            db.transaction(tx => {
+                tx.executeSql(
+                    WordTag.Query.SELECT_ALL_WORDTAG_QUERY,
+                    [word_id],
+                    (_, {rows: { _array } }) => result = _array
+                )
+            }, error => {
+                reject(error)
+            }, success => {
+                resolve(result);
+            })
+        })
+    }
+
     getTagWords = (tag_id, error_callback, success_callback) => {
         result = undefined;
         db.transaction(tx => {
@@ -579,6 +613,23 @@ class Database {
                 console.log(error);
             }
         });
+    }
+
+    getWordSynonyms = (meaning_id) => {
+        return new Promise((resolve, reject) => {
+            result = undefined;
+            db.transaction(tx => {
+                tx.executeSql(
+                    WordSynonym.Query.SELECT_ALL_WORDSYNONYM_QUERY,
+                    [meaning_id],
+                    (_, {rows: { _array } }) => result = _array
+                )
+            }, error => {
+                reject(error);
+            }, success => {
+                resolve(result);
+            });
+        })
     }
 
     printDatabaseLocation() {
