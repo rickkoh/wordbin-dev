@@ -1,9 +1,9 @@
 {
   "expoServerPort": 19000,
   "packagerPort": 19001,
-  "packagerPid": 13976,
-  "expoServerNgrokUrl": "https://yw-d2q.rickkoh.wordbin-dev.exp.direct",
-  "packagerNgrokUrl": "https://packager.yw-d2q.rickkoh.wordbin-dev.exp.direct",
-  "ngrokPid": 7900,
+  "packagerPid": 11476,
+  "expoServerNgrokUrl": null,
+  "packagerNgrokUrl": null,
+  "ngrokPid": null,
   "devToolsPort": 19002
 }

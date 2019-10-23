@@ -139,114 +139,39 @@ class AddWordScreen extends React.Component {
 
     addButtonPressed = () => {
 
-        word_id = undefined;
-
-        start = () => {
-            addWord();
-        }
-
-        addWord = () => {
-            database.addWord(this.state.word,
-                () => {
-                    fail();
-                },
-                (new_word_id) => {
-                    word_id = new_word_id;
-                    pass();
-                }
-            );
-
-            function fail() {
-                navigateBack();
-            }
-
-            function pass() {
-                addMeaning();
+        async function asyncForEach(array, callback) {
+            for (let index = 0; index < array.length; index++) {
+                await callback(array[index], index, array);
             }
         }
 
-        addMeaning = () => {
-            if (this.state.meaning.length > 0) {
-                database.addMeanings(word_id, this.state.meaning,
-                    () => {
-                        fail();
-                    },
-                    (success) => {
-                        pass();
-                    }
-                );
-            } else {
-                fail();
-            }
+        // Maybe use entities
 
-            function fail() {
-                addTags();
-            }
+        Word = this.state.word;
+        Meanings = this.state.meaning
+        Tag = this.state.tags;
 
-            function pass() {
-                addTags();
-            }
-        }
+        database.addWord(Word).then(async word_id => {
+            await asyncForEach(Meanings, async (meaning) => {
+                meaning.meaning_word_id = word_id;
+                await database.addMeaning(meaning)
+                .catch((error) => console.log(error));
+            })
 
-        addTags = () => {
+            await asyncForEach(Tag, async (tag) => {
+                await database.addTag(tag).then(async tag_id => {
+                    await database.addWordTag(word_id, tag_id)
+                    .catch((error) => console.log(error));
+                })
+                .catch((error) => console.log(error))
+            })
+        })
+        .catch((error) => console.log(error))
+        .then(() => this.props.navigation.goBack())
 
-            tags = this.state.tags.splice(0, this.state.tags.length - 1);
-
-            if (tags.length > 0) {
-                tags.forEach(async (tag, index) => {
-                    database.getTag(tag.tag_title,
-                        () => fail(),
-                        (data) => {
-                            if (data.length > 0) {
-                                tag_id = data[0].tag_id;
-                                link(tag_id, index);
-                            } else {
-                                database.addTag(tag,
-                                    (errorMessage) => console.log(errorMessage),
-                                    (new_tag_id) => {
-                                        tag_id = new_tag_id
-                                        link(tag_id, index);
-                                    }
-                                )
-                            }
-                        }
-                    );
-                });
-            } else {
-                fail();
-            }
-
-            function link(tag_id, index) {
-                console.log('linking word ' + word_id + ' and ' + tag_id);
-                database.addWordTag(word_id, tag_id,
-                    (errorMessage) => {
-                        if (index == tags.length - 1) pass();
-                    },
-                    (success) => {
-                        if (success) pass();
-                    }
-                )
-            }
-
-            function fail() {
-                navigateBack();
-            }
-
-            function pass() {
-                navigateBack();
-            }
-        }
-
-        navigateBack = () => {
-            this.props.navigation.goBack();
-        }
-
-        start();
     }
 
-    // Type stupid shit here and get scolded
-    // convert this to a component
-    // idea is to design the keyboard bar using a form (or an array/object)
+    // TODO: Clean this chunk of code
     renderKeyboardBar = () => {
         return(
             <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
@@ -270,7 +195,7 @@ class AddWordScreen extends React.Component {
                     </TouchableOpacity>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end'}}>
-                    <TouchableOpacity onPress={this.addButtonPressed}>
+                    <TouchableOpacity onPress={this.addButtonPressed2}>
                         <Icon name='add' color={colors.default.blue}/>
                     </TouchableOpacity>
                 </View>

@@ -8,7 +8,6 @@ import Header from '../components/Header';
 import WordBrowser from '../components/WordBrowser';
 import AddActionButton from '../components/AddActionButton';
 import database from '../services/Database';
-import PillButton from '../components/PillButton';
 
 export default class HomeScreen extends React.Component {
 
@@ -17,21 +16,15 @@ export default class HomeScreen extends React.Component {
 
         this.state = {
             title: 'Home',
-            Words: [],
-            Meanings: [],
-            Synonyms: [],
         }
 
         console.disableYellowBox = true;
     }
 
     componentWillMount() {
+        this.refreshData();
         DeviceEventEmitter.addListener("database_changed", () => this.refreshData());
         DeviceEventEmitter.addListener("change_title", (title) => this.setState({title: title}));
-    }
-
-    componentDidMount() {
-        this.refreshData();
     }
 
     refreshData = () => {
@@ -50,25 +43,30 @@ export default class HomeScreen extends React.Component {
         entities = {}
 
         return new Promise(async (resolve, reject) => {
-            await database.getWordss().then(async data => {
+            await database.getWords().then(async data => {
                 entities.Words = data;
                 await asyncForEach(data, async (word, word_index) => {
-                    await database.getWordTagss(word.word_id).then(async data => {
+                    await database.getWordTags(word.word_id).then(async data => {
                         entities.Words[word_index].Tags = data;
                     })
-                    await database.getMeaningss(word.word_id).then(async data => {
+                    .catch(error => reject(error))
+                    await database.getMeanings(word.word_id).then(async data => {
                         entities.Words[word_index].Meanings = data;
                         await asyncForEach(data, async (meaning, meaning_index) => {
-                            await database.getWordSynonyms(meaning.meaning_id).then(async data => {
+                            await database.getWordSynonym(meaning.meaning_id).then(async data => {
                                 entities.Words[word_index].Meanings[meaning_index].Synonyms = data;
                             })
+                            .catch(error => reject(error))
                         })
                     })
+                    .catch(error => reject(error))
                 })
 
                 // Async test: Done should be called before entities obj is returned
                 // console.log('Done');
-            }).then(() => resolve(entities))
+            })
+            .then(() => resolve(entities))
+            .catch(error => reject(error))
         })
     }
 
@@ -78,7 +76,7 @@ export default class HomeScreen extends React.Component {
 
     // Render
     render() {
-        console.log("render");
+        console.log("render")
         return (
             <View style={{flex: 1, backgroundColor: colors.default.backgroundColor}}>
                 <Header
@@ -105,10 +103,9 @@ export default class HomeScreen extends React.Component {
                 {this.state.Words == undefined || this.state.Words.length <= 0 ?
                 (<View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                     <TouchableOpacity
-                        text="Add Your First Word"
                         onPress={() => this.props.navigation.navigate('AddWord')}
                     >
-                        <Text style={{color: colors.default.blue, fontSize: 16, marginBottom: 100}}>Add Your First Word</Text>
+                        <Text style={{color: colors.default.blue, fontSize: 16, marginBottom: 100, fontWeight: 'bold'}}>Add Your First Word</Text>
                     </TouchableOpacity>
                 </View>) :
                 (<WordBrowser

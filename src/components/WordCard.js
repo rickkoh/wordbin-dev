@@ -29,9 +29,7 @@ class WordCard extends React.Component {
                 <View style={{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 10, borderWidth: 1, borderColor: '#e1edf0', backgroundColor: colors.default.backgroundColor}}>
                     <View style={{alignItems: 'flex-end'}}>
                         <TouchableOpacity style={{marginLeft: 10, marginRight: 5}} onPress={() => {
-                            database.deleteWord(this.props.word.word_id,
-                                (errorMessage) => console.log(errorMessage),
-                                (success) => DeviceEventEmitter.emit('database_changed'));
+                            database.deleteWord(this.props.word.word_id).then(() => DeviceEventEmitter.emit('database_changed'));
                         }}>
                             <Text style={{fontWeight: 'bold'}}>. . .</Text>
                         </TouchableOpacity>
