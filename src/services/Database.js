@@ -1,7 +1,6 @@
 // Import modules
 import { SQLite } from 'expo-sqlite';
 import * as FileSystem from 'expo-file-system';
-import { normalize, schema } from 'normalizr'; 
 
 // Import models
 import Word from '../models/Word';
@@ -13,6 +12,8 @@ import WordTag from '../models/WordTag';
 import WordSynonym from '../models/WordSynonym';
 
 const DATABASE_NAME = 'db.db';
+
+// TODO: Devise a proper naming convention for the database functions
 
 db = SQLite.openDatabase(DATABASE_NAME);
 
@@ -223,7 +224,7 @@ class Database {
             result = undefined;
             db.transaction(tx => {
                 tx.executeSql(
-                    Word.Query.SELECT_ALL_WORD_QUERY,
+                    Word.Query.SELECT_ALL_WORD_QUERY_ORDERBY_LATEST,
                     [],
                     (_, {rows: { _array } }) => result = _array 
                 );
@@ -236,12 +237,11 @@ class Database {
     }
 
     getWordsByTags(tag_id) {
-
         return new Promise((resolve, reject) => {
             result = undefined;
             db.transaction(tx => {
                 tx.executeSql(
-                    WordTag.Query.SELECT_ALL_TAGWORD_QUERY,
+                    WordTag.Query.SELECT_ALL_TAGWORD_ORDERBY_LATEST_QUERY,
                     [tag_id],
                     (_, {rows: { _array } }) => result = _array
                 )

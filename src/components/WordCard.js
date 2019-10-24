@@ -4,6 +4,8 @@ import { withNavigation } from 'react-navigation';
 
 import { colors } from '../Styles';
 
+import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
+
 import Tag from './Tag';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import database from '../services/Database';
@@ -20,6 +22,10 @@ class WordCard extends React.Component {
         }
     }
 
+    hideMenu() {
+        this._menu.hide();
+    }
+
     render() {
         
         this.cleanString();
@@ -29,9 +35,29 @@ class WordCard extends React.Component {
                 <View style={{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 10, borderWidth: 1, borderColor: '#e1edf0', backgroundColor: colors.default.backgroundColor}}>
                     <View style={{alignItems: 'flex-end'}}>
                         <TouchableOpacity style={{marginLeft: 10, marginRight: 5}} onPress={() => {
-                            database.deleteWord(this.props.word.word_id).then(() => DeviceEventEmitter.emit('database_changed'));
+                            this._menu.show();
                         }}>
-                            <Text style={{fontWeight: 'bold'}}>. . .</Text>
+                            <Text style={{fontWeight: 'bold'}}>...</Text>
+                            <Menu ref={(ref) => this._menu = ref} style={{backgroundColor: 'black'}}>
+                                <MenuItem onPress={() => {
+                                    console.log('Move item up');
+                                    this.hideMenu();
+                                }}>
+                                    <Text style={{color: 'white'}}>Move Up</Text>
+                                </MenuItem>
+                                <MenuItem onPress={() => {
+                                    console.log('Move item up');
+                                    this.hideMenu();
+                                }}>
+                                    <Text style={{color: 'white'}}>Move Down</Text>
+                                </MenuItem>
+                                <MenuItem onPress={() => {
+                                    database.deleteWord(this.props.word.word_id).then(() => DeviceEventEmitter.emit('database_changed'));
+                                    this.hideMenu();
+                                }}>
+                                    <Text style={{color: 'white'}}>Delete</Text>
+                                </MenuItem>
+                            </Menu>
                         </TouchableOpacity>
                     </View>
                     <Text style={{fontSize: 20, marginBottom: 5 }}>{this.props.word.word_text}</Text>
@@ -88,7 +114,7 @@ class WordCard extends React.Component {
         } else {
             // Render tag
             return (
-                <TouchableOpacity onPress={() => DeviceEventEmitter.emit("change_title", (item.tag_title))}>
+                <TouchableOpacity onPress={() => DeviceEventEmitter.emit("change_title", (item))}>
                     <Tag value={item.tag_title}/>
                 </TouchableOpacity>
             )
@@ -96,9 +122,5 @@ class WordCard extends React.Component {
     }    
     
 }
-
-const styles = StyleSheet.create({
-    
-})
 
 export default withNavigation(WordCard);

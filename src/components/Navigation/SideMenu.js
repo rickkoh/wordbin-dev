@@ -22,15 +22,12 @@ class SideMenu extends React.Component {
     }
 
     loadSeries = () => {
-        database.getSeries(null,
-            (data) => {
-                this.setState({data: data})
-            });
+        database.getSeries().then(data => this.setState({data: data}));
     }
 
     // Add listeners
     componentWillMount() {
-        DeviceEventEmitter.addListener("database_changed", () => this.loadSeries());
+        DeviceEventEmitter.addListener("database_series_changed", () => this.loadSeries());
     }
 
     componentDidMount() {
@@ -110,7 +107,7 @@ class SideMenu extends React.Component {
                                 onPress={
                                 () => {
                                     database.addSeries(this.state.newSeriesTitle);
-                                    DeviceEventEmitter.emit("database_changed");
+                                    DeviceEventEmitter.emit("database_series_changed");
                                     this.setState(prevState => ({
                                         isModalVisible: false,
                                         newSeriesTitle: '',

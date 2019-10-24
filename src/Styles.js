@@ -9,6 +9,7 @@ export const colors = {
         primaryColor: 'black',
         secondaryColor: 'darkgray',
         tertiaryColor: 'lightgray',
+        black: 'black',
         blue: '#41a4ea',
         red: '#e74c3c',
         lightred: '#e86e6e',
