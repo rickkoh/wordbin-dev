@@ -145,8 +145,6 @@ class AddWordScreen extends React.Component {
             }
         }
 
-        // Maybe use entities
-
         Word = this.state.word;
         Meanings = this.state.meaning
         Tag = this.state.tags;
@@ -157,13 +155,22 @@ class AddWordScreen extends React.Component {
                 await database.addMeaning(meaning)
                 .catch((error) => console.log(error));
             })
-
             await asyncForEach(Tag, async (tag) => {
-                await database.addTag(tag).then(async tag_id => {
-                    await database.addWordTag(word_id, tag_id)
-                    .catch((error) => console.log(error));
-                })
-                .catch((error) => console.log(error))
+                await database.getTag(tag.tag_title).then(async data => {
+                    // Tag already exist, just link the tag
+                    if (data.length > 0) {
+                        await database.addWordTag(word_id, data[0].tag_id)
+                        .catch(error => console.log(error))
+                    }
+                    // Tag doesn't exist, create tag first then link the tag
+                    else {
+                        await database.addTag(tag).then(async tag_id => {
+                            await database.addWordTag(word_id, tag_id)
+                            .catch((error) => console.log(error));
+                        })
+                        .catch((error) => console.log(error))
+                    }
+                }).catch(error => console.log(error))
             })
         })
         .catch((error) => console.log(error))

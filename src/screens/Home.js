@@ -4,6 +4,8 @@ import { Icon } from 'react-native-elements';
 
 import { headerStyles, colors } from '../Styles';
 
+import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
+
 import Header from '../components/Header';
 import WordBrowser from '../components/WordBrowser';
 import AddActionButton from '../components/AddActionButton';
@@ -24,15 +26,24 @@ export default class HomeScreen extends React.Component {
     componentWillMount() {
         this.refreshData();
         DeviceEventEmitter.addListener("database_changed", () => this.refreshData());
-        DeviceEventEmitter.addListener("change_title", (title) => this.setState({title: title}));
+        DeviceEventEmitter.addListener("filter_by_wordseries", (tag) => {
+
+        })
+        DeviceEventEmitter.addListener("change_title", (tag) => {
+            this.state.title = tag.tag_title;
+            this.loadData("tag", [tag.tag_id]).then(data => this.setState(data));
+        });
     }
 
     refreshData = () => {
-        console.log('data refreshed');
+        console.log("refresh data called");
+        this.state.title = "Home";
         this.loadData().then((data) => this.setState(data));
     }
 
-    loadData = () => {
+    loadData = (opts, args) => {
+
+        entities = {}
 
         async function asyncForEach(array, callback) {
             for (let index = 0; index < array.length; index++) {
@@ -40,38 +51,53 @@ export default class HomeScreen extends React.Component {
             }
         }
 
-        entities = {}
-
-        return new Promise(async (resolve, reject) => {
-            await database.getWords().then(async data => {
-                entities.Words = data;
-                await asyncForEach(data, async (word, word_index) => {
-                    await database.getWordTags(word.word_id).then(async data => {
-                        entities.Words[word_index].Tags = data;
-                    })
-                    .catch(error => reject(error))
-                    await database.getMeanings(word.word_id).then(async data => {
-                        entities.Words[word_index].Meanings = data;
-                        await asyncForEach(data, async (meaning, meaning_index) => {
-                            await database.getWordSynonym(meaning.meaning_id).then(async data => {
-                                entities.Words[word_index].Meanings[meaning_index].Synonyms = data;
-                            })
-                            .catch(error => reject(error))
-                        })
-                    })
-                    .catch(error => reject(error))
+        if (opts == "tag") {
+            // "tag", [tag_id]
+            return new Promise(async (resolve, reject) => {
+                await database.getWordsByTags(args[0]).then(async data => {
+                    entities.Words = data;
+                    await clip(data);
                 })
-
-                // Async test: Done should be called before entities obj is returned
-                // console.log('Done');
+                .then(() => resolve(entities))
+                .catch(error => reject(error))
             })
-            .then(() => resolve(entities))
-            .catch(error => reject(error))
-        })
+        } else {
+            // default
+            return new Promise(async (resolve, reject) => {
+                await database.getWords().then(async data => {
+                    entities.Words = data;
+                    await clip(data);
+                })
+                .then(() => resolve(entities))
+                .catch(error => reject(error))
+            })
+        }
+
+        // Clip word data
+        async function clip(data) {
+            await asyncForEach(data, async (word, word_index) => {
+                await database.getWordTags(word.word_id).then(async data => {
+                    entities.Words[word_index].Tags = data;
+                })
+                .catch(error => reject(error))
+                await database.getMeanings(word.word_id).then(async data => {
+                    entities.Words[word_index].Meanings = data;
+                    await asyncForEach(data, async (meaning, meaning_index) => {
+                        await database.getWordSynonym(meaning.meaning_id).then(async data => {
+                            entities.Words[word_index].Meanings[meaning_index].Synonyms = data;
+                        })
+                        .catch(error => reject(error))
+                    })
+                })
+                .catch(error => reject(error))
+            })
+        }
+
     }
 
     test = () => {
-        this.loadData().then((data) => console.log(data));
+        console.log(this.state);
+        this._menu.show();
     }
 
     // Render
@@ -88,7 +114,7 @@ export default class HomeScreen extends React.Component {
                         </TouchableOpacity>
                     }
                     headerTitle={
-                        <Text style={headerStyles.headerTitle}>
+                        <Text style={headerStyles.headerTitle} onPress={() => this.refreshData()}>
                             {this.state.title}
                         </Text>
                     }
@@ -97,6 +123,16 @@ export default class HomeScreen extends React.Component {
                             onPress={this.test}
                             style={headerStyles.headerButtonRight}>
                             <Icon name='grid' type="entypo" color={colors.default.primaryColor}/>
+                            <Menu ref={(ref) => this._menu = ref}
+                                style={{backgroundColor: 'black'}}
+                            >
+                                <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Default</Text></MenuItem>
+                                <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Alphabet</Text></MenuItem>
+                                <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Latest</Text></MenuItem>
+                                <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Earliest</Text></MenuItem>
+                                <MenuDivider color={colors.default.lightgray} />
+                                <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Custom</Text></MenuItem>
+                            </Menu>
                         </TouchableOpacity>
                     }
                 />
