@@ -70,7 +70,7 @@ class Header extends React.Component {
 
     render() {
         return(
-            <View>
+            <View style={{backgroundColor: this.props.backgroundColor}}>
                 {this.renderHeader()}
             </View>
         )

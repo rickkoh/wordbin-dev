@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Text, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import Modal from 'react-native-modal';
 
 import { colors } from '../../Styles';
 import { SCREEN_WIDTH } from '../../Measurements';
@@ -11,6 +12,7 @@ class MeaningForm extends React.Component {
 
         this.state = {
             meaningIndex: 0,
+            isModalVisible: false,
         }
 
         // Props
@@ -25,10 +27,7 @@ class MeaningForm extends React.Component {
 
         // onMeaningIndexChange
 
-        // Todolist
-        // O Meaning text input
-        // O Classification text input
-        // O onMeaningIndexChange
+        // TODO:
         // X Modal
         // X Synonym values
         // X Antonym values
@@ -69,6 +68,10 @@ class MeaningForm extends React.Component {
                         <Text style={{color: colors.default.blue}}>More options</Text>
                     </TouchableOpacity>
                 </View>
+
+                <Modal>
+
+                </Modal>
             </View>
         )
     }

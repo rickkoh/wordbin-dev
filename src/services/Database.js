@@ -236,6 +236,23 @@ class Database {
         })
     }
 
+    getWord(word_id) {
+        return new Promise((resolve, reject) => {
+            result = undefined;
+            db.transaction(tx => {
+                tx.executeSql(
+                    Word.Query.SELECT_WORD_BY_ID_QUERY,
+                    [word_id],
+                    (_, {rows: { _array } }) => result = _array 
+                );
+            }, error => {
+                reject(error);
+            }, success => {
+                resolve(result);
+            });
+        })
+    }
+
     getWordsByTags(tag_id) {
         return new Promise((resolve, reject) => {
             result = undefined;

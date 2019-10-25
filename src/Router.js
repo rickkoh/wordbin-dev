@@ -8,7 +8,9 @@ import SideMenu from './components/Navigation/SideMenu';
 // Screens
 import HomeScreen from './screens/Home';
 import AddWordScreen from './screens/AddWord';
-import ViewWordScreen from './screens/ViewWord';
+import Browse from './screens/Browse';
+import SeriesPage from './screens/SeriesPage';
+import WordPage from './screens/WordPage';
 import SettingsScreen from './screens/Settings';
 
 // Home Stack
@@ -21,8 +23,11 @@ const HomeStack = createStackNavigator(
         AddWord: {
             screen: AddWordScreen
         },
-        ViewWord: {
-            screen: ViewWordScreen
+        WordPage: {
+            screen: WordPage
+        },
+        SeriesPage: {
+            screen: SeriesPage
         },
     },
     {
@@ -37,6 +42,9 @@ const HomeStack = createStackNavigator(
 // Drawer Navigator
 const DrawerNavigator = createDrawerNavigator({
     Home: HomeStack,
+    Browse: {
+        screen: Browse
+    },
     //AddWord: {
         //screen: AddWordScreen,
         //navigationOptions: {

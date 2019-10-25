@@ -126,7 +126,6 @@ export default class HomeScreen extends React.Component {
                             <Menu ref={(ref) => this._menu = ref}
                                 style={{backgroundColor: 'black'}}
                             >
-                                <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Default</Text></MenuItem>
                                 <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Alphabet</Text></MenuItem>
                                 <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Latest</Text></MenuItem>
                                 <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Earliest</Text></MenuItem>

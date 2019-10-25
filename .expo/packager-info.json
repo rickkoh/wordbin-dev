@@ -1,9 +1,9 @@
 {
-  "expoServerPort": 19000,
-  "packagerPort": 19001,
-  "packagerPid": 15260,
-  "expoServerNgrokUrl": "https://ib-iay.rickkoh.wordbin-dev.exp.direct",
-  "packagerNgrokUrl": "https://packager.ib-iay.rickkoh.wordbin-dev.exp.direct",
-  "ngrokPid": 7204,
+  "expoServerPort": null,
+  "packagerPort": null,
+  "packagerPid": null,
+  "expoServerNgrokUrl": null,
+  "packagerNgrokUrl": null,
+  "ngrokPid": null,
   "devToolsPort": 19002
 }
