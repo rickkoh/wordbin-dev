@@ -7,6 +7,9 @@ class SeriesPage extends React.Component {
         super(props);
     }
 
+    // Use Animation get the scrolling effect
+    // Once the scrolling effect is done do it on home screen
+
     render() {
         return(
             <View style={{flex: 1}}>
