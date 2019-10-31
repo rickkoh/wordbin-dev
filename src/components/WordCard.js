@@ -31,8 +31,8 @@ class WordCard extends React.Component {
         this.cleanString();
 
         return(
-            <TouchableOpacity onPress={() => this.props.navigation.navigate("SeriesPage")}>
-                <View style={{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 10, borderWidth: 1, borderColor: '#e1edf0', backgroundColor: colors.default.backgroundColor}}>
+            <TouchableOpacity style={styles.boxWithShadow}>
+                <View style={{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 10, backgroundColor: colors.default.backgroundColor}}>
                     <View style={{alignItems: 'flex-end'}}>
                         <TouchableOpacity style={{marginLeft: 10, marginRight: 5}} onPress={() => {
                             this._menu.show();
@@ -115,12 +115,26 @@ class WordCard extends React.Component {
             // Render tag
             return (
                 <TouchableOpacity onPress={() => DeviceEventEmitter.emit("change_title", (item))}>
-                    <Tag value={item.tag_title}/>
+                    <Tag value={item.tag_title} style={{marginRight: 5, marginBottom: 10}}/>
                 </TouchableOpacity>
             )
         }
     }    
-    
 }
+
+const styles = StyleSheet.create({
+    boxWithShadow: {
+        marginBottom: 5,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+
+        elevation: 3,
+    }
+})
 
 export default withNavigation(WordCard);
