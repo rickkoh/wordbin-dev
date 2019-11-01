@@ -1,57 +1,62 @@
 import React from 'react';
-import { DeviceEventEmitter, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
+import { DeviceEventEmitter, KeyboardAvoidingView, Text, View, TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
 
-import { colors, headerStyles } from '../Styles';
+import { colors } from '../Styles';
 
-import Header from '../components/Header';
+import Modal from 'react-native-modal';
 import PillButton from '../components/PillButton';
+
 import WordInput from '../components/Forms/WordInput';
 import PronunciationInput from '../components/Forms/PronunciationInput';
 import MeaningForm from '../components/Forms/MeaningForm';
 import TagForm from '../components/Forms/TagForm';
 
-import MeaningFormModal from '../components/Forms/MeaningFormModal';
-
 import database from '../services/Database';
 
-class AddWordScreen extends React.Component {
+const defaultState = {
+    word: {
+        word_id: undefined,
+        word_text: undefined,
+        word_pronunciation: undefined,
+        word_origin: undefined,
+        word_datetimeadded: undefined,
+    },
+    meaning: [
+        {
+            meaning_id: undefined,
+            meaning_text: undefined,
+            meaning_classification: undefined,
+            meaning_datetimecreated: undefined,
+        }
+    ],
+    tags: [
+        {
+            tag_title: undefined,
+        }
+    ],
+    meaningCurrentIndex: undefined,
+    keyboardBarType: undefined,
+    wordIsValidated: false,
+    wordHasAPIdata: false,
+    datetimeadded: undefined,
+    isValidated: false,
+}
+
+class AddWordModal extends React.Component {
 
     constructor(props) {
         super(props);
 
-        this.state = {
-            word: {
-                word_id: undefined,
-                word_text: undefined,
-                word_pronunciation: undefined,
-                word_origin: undefined,
-                word_datetimeadded: undefined,
-            },
-            meaning: [
-                {
-                    meaning_id: undefined,
-                    meaning_text: undefined,
-                    meaning_classification: undefined,
-                    meaning_datetimecreated: undefined,
-                }
-            ],
-            tags: [
-                {
-                    tag_title: undefined,
-                }
-            ],
-            meaningCurrentIndex: undefined,
-            keyboardBarType: undefined,
-            wordIsValidated: false,
-            wordHasAPIdata: false,
-            datetimeadded: undefined,
-            isValidated: false,
-        }
+        // TODO: There should be a more elegant way to code this than to do this manually
+
+        this.state = defaultState;
     }
 
     // Perform validation
     componentDidUpdate(prevProps, prevState) {
+        console.log('updating');
+
         // Validate Word
         if (this.state.word.word_text != undefined && this.state.word.word_text != "" && this.state.word.word_text.length <= 64) {
             if (prevState.isValidated != true) this.setState({ isValidated: true });
@@ -60,13 +65,16 @@ class AddWordScreen extends React.Component {
         }
     }
 
-    componentDidMount() {
-        this.wordInput.focus();
-    }
-
-    // Notify listeners
     componentWillUnmount() {
-        DeviceEventEmitter.emit("database_changed");
+        console.log('unmounting awm');
+        this.setState({});
+        // this.setState({meaning: [{
+                // meaning_id: undefined,
+                // meaning_text: undefined,
+                // meaning_classification: undefined,
+                // meaning_datetimecreated: undefined,
+            // }]
+        // })
     }
 
     handleMeaningChange = (text, index) => {
@@ -87,11 +95,6 @@ class AddWordScreen extends React.Component {
         this.setState({ meaning: meaning });
     }
 
-    handleMeaningSentenceExampleChange = (text , index) => {
-        meaning = this.state.meaning;
-        meaning[index].sentenceexample
-    }
-
     handleClassificationChange = (text, index) => {
         meaning = this.state.meaning;
         meaning[index].meaning_classification = text;
@@ -103,7 +106,7 @@ class AddWordScreen extends React.Component {
         meaning = this.state.meaning;
         meaning.splice(this.state.meaningCurrentIndex, 1);
         this.setState({ meaning: meaning })
-    }
+}
 
     handleTagChange = (text) => {
         if (text.length > 1 && text[text.length-1] == " "){
@@ -135,9 +138,8 @@ class AddWordScreen extends React.Component {
         this.setState({ tags: tags });
     }
 
-    toggleModalVisibility = () => {
-        console.log('toggling');
-        this.setState(prevState => ({isModalVisible: !prevState.isModalVisible}))
+    test = () => {
+        this.setState(defaultState);
     }
 
     addButtonPressed = () => {
@@ -153,6 +155,8 @@ class AddWordScreen extends React.Component {
         Word = this.state.word;
         Meanings = this.state.meaning
         Tag = this.state.tags;
+
+        this.setState({});
 
         database.addWord(Word).then(async word_id => {
             await asyncForEach(Meanings, async (meaning) => {
@@ -179,8 +183,10 @@ class AddWordScreen extends React.Component {
             })
         })
         .catch((error) => console.log(error))
-        .then(() => this.props.navigation.goBack())
-
+        .then(() => {
+            this.props.toggleVisibility();
+            DeviceEventEmitter.emit("database_changed")
+        })
     }
 
     // TODO: Clean this chunk of code
@@ -207,7 +213,7 @@ class AddWordScreen extends React.Component {
                     </TouchableOpacity>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end'}}>
-                    <TouchableOpacity onPress={() => this.setState({isModalVisible: true})}>
+                    <TouchableOpacity onPress={this.test}>
                         <Icon name='add' color={colors.default.blue}/>
                     </TouchableOpacity>
                 </View>
@@ -215,67 +221,58 @@ class AddWordScreen extends React.Component {
     }
 
     render() {
+        console.log("rendering awm");
         return (
-            <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" enabled>
-                <Header
-                    headerLeft={
-                        <TouchableOpacity
-                            onPress={() => this.props.navigation.goBack()}
-                            style={headerStyles.headerButtonLeft}>
-                            <Text numberOfLines={1} style={{color: colors.default.blue, fontSize: 16}}>Cancel</Text>
-                        </TouchableOpacity>
-                    }
-                    headerTitle={
-                        <Text style={headerStyles.headerTitle}>{this.props.title}</Text>
-                    }
-                    headerRight={
-                        <PillButton
-                            text="Add"
-                            style={headerStyles.headerButtonRight}
-                            enabled={this.state.isValidated}
-                            onPress={this.addButtonPressed}
+            <Modal
+                isVisible={this.props.isVisible}
+                swipeDirection={['down']}
+                swipeThreshold={300}
+                onSwipeComplete={() => this.props.toggleVisibility()}
+                onShow={() => this.wordInput.focus()}
+                style={{margin: 0}}
+            >
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" enabled>
+                    <View style={{flex: 1, marginTop: 37.5, borderTopLeftRadius: 30, borderTopRightRadius: 30, backgroundColor: 'white'}}>
+                        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 20, marginBottom: 10, borderTopLeftRadius: 30, borderTopRightRadius: 30}}>
+                            <TouchableOpacity onPress={this.props.toggleVisibility}>
+                                <Text style={{color: colors.default.blue, fontSize: 16, marginLeft: 20}}>Cancel</Text>
+                            </TouchableOpacity>
+                            <PillButton enabled={this.state.isValidated} text="Add" style={{marginRight: 20}} onPress={() => this.addButtonPressed()}/>
+                        </View>
+                        <WordInput
+                            ref={(ref) => { this.wordInput = ref }}
+                            value={this.state.word.word_text}
+                            onChangeText={(text) => this.setState((prevState) => ({word: { ...prevState.word, word_text: text}}))}
+                            onFocus={() => this.setState({keyboardBarType: 'word'})}
                         />
-                    }
-                />
-                <WordInput
-                    ref={(ref) => { this.wordInput = ref }}
-                    value={this.state.word.word_text}
-                    onChangeText={(text) => this.setState((prevState) => ({word: { ...prevState.word, word_text: text}}))}
-                    onFocus={() => this.setState({keyboardBarType: 'word'})}
-                />
-                <PronunciationInput
-                    value={this.state.word.word_pronunciation}
-                    onChangeText={(text) => this.setState((prevState) => ({word: { ...prevState.word, word_pronunciation: text}}))}
-                    onFocus={() => this.setState({keyboardBarType: 'word'})}
-                />
-                <MeaningForm
-                    ref={(ref) => { this.meaningForm = ref }}
-                    data={this.state.meaning}
-                    onMeaningIndexChange={(index) => this.setState({meaningCurrentIndex: index})}
-                    onMeaningTextChange={this.handleMeaningChange}
-                    onClassificationTextChange={this.handleClassificationChange}
-                    onFocus={() => this.setState({keyboardBarType: 'meaning'})}
-                />
-                <TagForm
-                    value={this.state.tags[this.state.tags.length-1].tag_title}
-                    data={this.state.tags}
-                    onChangeText={this.handleTagChange}
-                    onPress={this.removeTag}
-                    onFocus={() => this.setState({keyboardBarType: 'tag'})}
-                    onBlur={this.addTag}
-                />
-                <KeyboardBar
-                    renderContent={this.renderKeyboardBar()}
-                    enabled={this.state.isValidated}
-                />
-
-                <MeaningFormModal
-                    meaning={this.state.meaning[0]}
-                    keyboardBar={this.renderKeyboardBar()}
-                    toggleVisibility={this.toggleModalVisibility}
-                    isVisible={this.state.isModalVisible} toggleVisibility={this.toggleModalVisibility}
-                />
-            </KeyboardAvoidingView>
+                        <PronunciationInput
+                            value={this.state.word.word_pronunciation}
+                            onChangeText={(text) => this.setState((prevState) => ({word: { ...prevState.word, word_pronunciation: text}}))}
+                            onFocus={() => this.setState({keyboardBarType: 'word'})}
+                        />
+                        <MeaningForm
+                            ref={(ref) => { this.meaningForm = ref }}
+                            data={this.state.meaning}
+                            onMeaningIndexChange={(index) => this.setState({meaningCurrentIndex: index})}
+                            onMeaningTextChange={this.handleMeaningChange}
+                            onClassificationTextChange={this.handleClassificationChange}
+                            onFocus={() => this.setState({keyboardBarType: 'meaning'})}
+                        />
+                        <TagForm
+                            value={this.state.tags[this.state.tags.length-1].tag_title}
+                            data={this.state.tags}
+                            onChangeText={this.handleTagChange}
+                            onPress={this.removeTag}
+                            onFocus={() => this.setState({keyboardBarType: 'tag'})}
+                            onBlur={this.addTag}
+                        />
+                        <KeyboardBar
+                            renderContent={this.renderKeyboardBar()}
+                            enabled={this.state.isValidated}
+                        />
+                    </View>
+                </KeyboardAvoidingView>
+            </Modal>
         )
     }
 }
@@ -287,5 +284,4 @@ KeyboardBar = (props) => {
             </View>
         )
 }
-
-export default AddWordScreen;
+export default AddWordModal;

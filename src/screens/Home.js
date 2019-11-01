@@ -2,14 +2,19 @@ import React from 'react';
 import { Text, View, TouchableOpacity, DeviceEventEmitter } from 'react-native';
 import { Icon } from 'react-native-elements';
 
+import ignoreWarnings from 'react-native-ignore-warnings';
+
 import { headerStyles, colors } from '../Styles';
 
 import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
+
+import AddWordModal from './AddWordModal';
 
 import Header from '../components/Header';
 import WordBrowser from '../components/WordBrowser';
 import AddActionButton from '../components/AddActionButton';
 import database from '../services/Database';
+import PillButton from '../components/PillButton';
 
 export default class HomeScreen extends React.Component {
 
@@ -18,8 +23,10 @@ export default class HomeScreen extends React.Component {
 
         this.state = {
             title: 'Home',
+            isModalVisible: false,
         }
 
+        ignoreWarnings('error', ['Warning', 'Error']);
         console.disableYellowBox = true;
     }
 
@@ -41,6 +48,8 @@ export default class HomeScreen extends React.Component {
         this.loadData().then((data) => this.setState(data));
     }
 
+    // opts: tags, series, default etc
+    // args: arguments
     loadData = (opts, args) => {
 
         entities = {}
@@ -95,9 +104,15 @@ export default class HomeScreen extends React.Component {
 
     }
 
+    toggleModalVisibility = () => {
+        console.log('toggling');
+        this.setState(prevState => ({isModalVisible: !prevState.isModalVisible}))
+    }
+
     test = () => {
-        console.log(this.state);
+        // console.log(this.state);
         this._menu.show();
+        // this.toggleModalVisibility();
     }
 
     // Render
@@ -148,8 +163,14 @@ export default class HomeScreen extends React.Component {
                     data={this.state.Words}
                 />)}
                 <AddActionButton
-                    onPress={() => this.props.navigation.navigate('AddWord')}
+                    onPress={() => this.props.navigation.navigate("AddWord")}
                 />
+
+                <AddWordModal
+                    isVisible={this.state.isModalVisible}
+                    toggleVisibility={this.toggleModalVisibility}
+                />
+
             </View>
         )
 

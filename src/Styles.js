@@ -1,7 +1,8 @@
-import React from 'react';
 import { StyleSheet } from 'react-native';
-import { Header } from 'react-navigation';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
+
+// getstatusbarheight maybe write my own version
+// detect iPhone type / Android
 
 export const colors = {
     default: {

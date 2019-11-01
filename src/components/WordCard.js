@@ -31,54 +31,52 @@ class WordCard extends React.Component {
         this.cleanString();
 
         return(
-            <TouchableOpacity style={styles.boxWithShadow}>
-                <View style={{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 10, backgroundColor: colors.default.backgroundColor}}>
-                    <View style={{alignItems: 'flex-end'}}>
-                        <TouchableOpacity style={{marginLeft: 10, marginRight: 5}} onPress={() => {
-                            this._menu.show();
-                        }}>
-                            <Text style={{fontWeight: 'bold'}}>...</Text>
-                            <Menu ref={(ref) => this._menu = ref} style={{backgroundColor: 'black'}}>
-                                <MenuItem onPress={() => {
-                                    console.log('Move item up');
-                                    this.hideMenu();
-                                }}>
-                                    <Text style={{color: 'white'}}>Move Up</Text>
-                                </MenuItem>
-                                <MenuItem onPress={() => {
-                                    console.log('Move item up');
-                                    this.hideMenu();
-                                }}>
-                                    <Text style={{color: 'white'}}>Move Down</Text>
-                                </MenuItem>
-                                <MenuItem onPress={() => {
-                                    database.deleteWord(this.props.word.word_id).then(() => DeviceEventEmitter.emit('database_changed'));
-                                    this.hideMenu();
-                                }}>
-                                    <Text style={{color: 'white'}}>Delete</Text>
-                                </MenuItem>
-                            </Menu>
-                        </TouchableOpacity>
-                    </View>
-                    <Text style={{fontSize: 20, marginBottom: 5 }}>{this.props.word.word_text}</Text>
-                    {this.props.word.word_pronunciation == undefined ? null : (
-                        <Text style={{fontSize: 12, marginBottom: 5 }}>{this.props.word.word_pronunciation}</Text>
-                    )}
-                    <FlatList
-                        data={this.props.word.Meanings}
-                        renderItem={this.renderMeaning}
-                        keyExtractor={(item, index) => index.toString()}
-                        listKey={(item, index) => index.toString()}
-                    />
-                    <FlatList
-                        data={this.props.word.Tags}
-                        style={{flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center'}}
-                        renderItem={this.renderTag} 
-                        keyExtractor={(item, index) => index.toString()}
-                        listKey={(item, index) => index.toString()}
-                    />
+            <View style={[{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 10, backgroundColor: colors.default.backgroundColor}, styles.boxWithShadow]}>
+                <View style={{alignItems: 'flex-end'}}>
+                    <TouchableOpacity style={{marginLeft: 10, marginRight: 5}} onPress={() => {
+                        this._menu.show();
+                    }}>
+                        <Text style={{fontWeight: 'bold'}}>...</Text>
+                        <Menu ref={(ref) => this._menu = ref} style={{backgroundColor: 'black'}}>
+                            <MenuItem onPress={() => {
+                                console.log('Move item up');
+                                this.hideMenu();
+                            }}>
+                                <Text style={{color: 'white'}}>Move Up</Text>
+                            </MenuItem>
+                            <MenuItem onPress={() => {
+                                console.log('Move item up');
+                                this.hideMenu();
+                            }}>
+                                <Text style={{color: 'white'}}>Move Down</Text>
+                            </MenuItem>
+                            <MenuItem onPress={() => {
+                                database.deleteWord(this.props.word.word_id).then(() => DeviceEventEmitter.emit('database_changed'));
+                                this.hideMenu();
+                            }}>
+                                <Text style={{color: 'white'}}>Delete</Text>
+                            </MenuItem>
+                        </Menu>
+                    </TouchableOpacity>
                 </View>
-            </TouchableOpacity>
+                <Text style={{fontSize: 20, marginBottom: 5}} onPress={() => this.props.navigation.navigate("SeriesPage")}>{this.props.word.word_text}</Text>
+                {this.props.word.word_pronunciation == undefined ? null : (
+                    <Text style={{fontSize: 12, marginBottom: 5 }}>{this.props.word.word_pronunciation}</Text>
+                )}
+                <FlatList
+                    data={this.props.word.Meanings}
+                    renderItem={this.renderMeaning}
+                    keyExtractor={(item, index) => index.toString()}
+                    listKey={(item, index) => index.toString()}
+                />
+                <FlatList
+                    data={this.props.word.Tags}
+                    style={{flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center'}}
+                    renderItem={this.renderTag} 
+                    keyExtractor={(item, index) => index.toString()}
+                    listKey={(item, index) => index.toString()}
+                />
+            </View>
         )
     }
 

@@ -17,6 +17,7 @@
     "react-dom": "^16.8.6",
     "react-native": "https://github.com/expo/react-native/archive/sdk-33.0.0.tar.gz",
     "react-native-action-button": "^2.8.5",
+    "react-native-collapsible-header-views": "^1.1.2",
     "react-native-draggable-flatlist": "^1.1.7",
     "react-native-elements": "^1.1.0",
     "react-native-ignore-warnings": "^0.1.1",

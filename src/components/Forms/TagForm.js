@@ -5,6 +5,8 @@ import ClearButton from '../ClearButton';
 
 import { SCREEN_WIDTH } from '../../Measurements';
 
+// TODO: Needs revamp
+
 class TagForm extends React.Component {
     constructor(props) {
         super(props);
@@ -17,23 +19,23 @@ class TagForm extends React.Component {
         this.flatList.scrollToIndex({animated: animated, index: index});
     }
 
-    renderTagList = () => {
+    _renderTagList = () => {
         // Starts with tag_title: undefined
         data = [...this.props.data];
         data.splice(data.length-1);
         return(
             <FlatList
                 data={data}
-                ref={(ref) => this.flatList = ref}
+                ref={ref => this.flatList = ref}
                 contentContainerStyle={{paddingHorizontal: 20, flexDirection: 'row', flexWrap: 'wrap', width: SCREEN_WIDTH}}
-                renderItem={this.renderTagItem}
+                renderItem={this._renderTagItem}
                 keyExtractor={(item, index) => index.toString()}
                 listKey={(item, index) => index.toString()}
             />
         )
     }
 
-    renderTagItem = ({item, index}) => {
+    _renderTagItem = ({item, index}) => {
         return(
             <View style={{marginBottom: 10, flexDirection: 'row', justifyContent: 'center'}}>
                 <View style={{flexDirection: 'row',  borderRadius: 5, backgroundColor: '#f4f7f8'}}>
@@ -59,7 +61,7 @@ class TagForm extends React.Component {
                     onBlur={this.props.onBlur}
                     onFocus={this.props.onFocus}
                 />
-                {this.renderTagList()}
+                {this._renderTagList()}
             </View>
         )
     }
