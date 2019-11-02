@@ -51,38 +51,21 @@ export default class SeriesPage extends Component {
     // Add listener
     this.state.scrollAnim.addListener(({ value }) => {
       console.log('Scroll value: ' + value);
+
       // Value definition
       // Difference = new value - current scroll value
       const diff = value - this._scrollValue;
-      // Set new scroll value
       this._scrollValue = value;
 
       // Figure out what's clamped value
 
-      // Clamped scroll value = old clamped scroll value + difference
-
-      // Clamped scroll value starts from 0
-      // Sometimes it can get negative?
-
       // When the difference is greater than the navbar height
-      // Clamped scroll value = navbar height
-
-      // When the difference is lesser than the navbar height
       // Clamped scroll value = difference height
-
-      // Clamped scroll value is now at 124
-      // The more I scroll down, the higher the difference, height will remain the same
-
       // Clamped scroll value will decrease when you scroll up
       // As long as you scroll up, it will be lesser than 124 immediately
-      // So this is where you can set the "additional" value that you want to set
 
-      // How do we add the additional value
-      // Expected behavior: Scroll a bit more first then start showing the navbar instead of just showing it straight away, add a little delay
-
-      // Clamped value is adjusting itself every second2
-
-      // Set a value thress hold
+      // Clamped value is adjusting itself every second
+      // Clamped value only from 0 - NAVBARHEIGHT - STATUS_BAR_HEIGHT
       this._clampedScrollValue = Math.min(
         Math.max(this._clampedScrollValue + diff, 0),
         NAVBAR_HEIGHT - STATUS_BAR_HEIGHT,
@@ -98,14 +81,11 @@ export default class SeriesPage extends Component {
   }
 
   componentWillUnmount() {
+    // Remove the listeners
     this.state.scrollAnim.removeAllListeners();
     this.state.offsetAnim.removeAllListeners();
   }
   
-  // Expected behavior
-  // Let go then decide
-  // 
-
   _onScrollEndDrag = () => {
     console.log('scroll end drag');
     this._scrollEndTimer = setTimeout(this._onMomentumScrollEnd, 250);
@@ -113,23 +93,27 @@ export default class SeriesPage extends Component {
 
   _onMomentumScrollBegin = () => {
     console.log('scroll begin');
-    this.state.offsetAnim.stopAnimation();
     clearTimeout(this._scrollEndTimer);
   };
 
   _onMomentumScrollEnd = () => {
-    // Understand scrollValue and clampedScrollValue
-    console.log(this._scrollValue); // Position of pixel stopped in the listview
-    console.log(this._clampedScrollValue); // Clamped Scroll Value is the amount of scroll value stuck on the header
-    console.log(this._offsetValue);
-    console.log(this._scrollValue > NAVBAR_HEIGHT + STATUS_BAR_HEIGHT); // What factor is this?
-    console.log(this._clampedScrollValue > ((NAVBAR_HEIGHT + STATUS_BAR_HEIGHT) / 2) + STATUS_BAR_HEIGHT); // 
+    // Deciding whether to open or close here
+    
+    console.log(this._scrollValue + " scroll value"); // Position of pixel stopped in the listview
+    console.log(this._clampedScrollValue + " clamped value"); // Clamped Scroll Value is the amount of scroll value stuck on the header
+    // Figure out what is offset
+    console.log(this._offsetValue + " offset value"); // Still not sure what is offset value
+    console.log(this._scrollValue > NAVBAR_HEIGHT + STATUS_BAR_HEIGHT); // More than navbar
+    console.log(this._clampedScrollValue > ((NAVBAR_HEIGHT + STATUS_BAR_HEIGHT) / 2) + STATUS_BAR_HEIGHT); // Clamped value more than half of the navbar
     const toValue = this._scrollValue > NAVBAR_HEIGHT + STATUS_BAR_HEIGHT &&
       this._clampedScrollValue > ((NAVBAR_HEIGHT - STATUS_BAR_HEIGHT) / 2) + STATUS_BAR_HEIGHT
-      ? this._offsetValue + NAVBAR_HEIGHT // close
-      : this._offsetValue - NAVBAR_HEIGHT; // open
+      ? this._offsetValue + NAVBAR_HEIGHT // open
+      : this._offsetValue - NAVBAR_HEIGHT; // close
+  
+    // Value that tells you whether it is going to collapse
+    console.log(toValue + " to value");
 
-    console.log(toValue);
+    // How is the toValue defined in the script
 
     Animated.timing(this.state.offsetAnim, {
       toValue,
@@ -170,6 +154,7 @@ export default class SeriesPage extends Component {
           onMomentumScrollBegin={this._onMomentumScrollBegin}
           onMomentumScrollEnd={this._onMomentumScrollEnd}
           onScrollEndDrag={this._onScrollEndDrag}
+          // So animated event essentially helps you retrieve the scrolling data
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: this.state.scrollAnim } } }],
             { useNativeDriver: true },
