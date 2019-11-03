@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, FlatList, TextInput, Text } from 'react-native';
 
-import Tag from './Tag';
+import Tag from '../components/Tag';
 
 import { SCREEN_WIDTH } from '../Measurements';
 
