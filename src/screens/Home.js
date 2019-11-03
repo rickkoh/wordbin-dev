@@ -14,7 +14,8 @@ import Header from '../components/Header';
 import WordBrowser from '../components/WordBrowser';
 import AddActionButton from '../components/AddActionButton';
 import database from '../services/Database';
-import PillButton from '../components/PillButton';
+
+import FlatListWithCollapsibleHeader from '../components/FlatListWithCollapsibleHeader';
 
 export default class HomeScreen extends React.Component {
 
