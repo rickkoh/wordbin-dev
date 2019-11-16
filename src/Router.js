@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { createStackNavigator, createDrawerNavigator, createAppContainer, DrawerItems } from 'react-navigation';
+import { createStackNavigator, createAppContainer, DrawerItems } from 'react-navigation';
+import { createDrawerNavigator } from 'react-navigation-drawer';
 
 // Components
 import SideMenu from './components/Navigation/SideMenu';
