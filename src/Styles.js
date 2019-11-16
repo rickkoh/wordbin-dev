@@ -1,8 +1,24 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform, Dimensions } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 
-// getstatusbarheight maybe write my own version
-// detect iPhone type / Android
+const dim = Dimensions.get('window');
+export const STATUS_BAR_HEIGHT = Platform.OS === 'ios'
+                        ? isIphoneXSize() || isIphoneXrSize()
+                        ? 44
+                        : 20
+                        : 24
+
+export const SCREEN_HEIGHT = dim.height;
+export const SCREEN_WIDTH = dim.width;
+
+function isIphoneXSize() {
+    console.log(dim.height);
+    return SCREEN_HEIGHT == 812 || SCREEN_WIDTH == 812;
+}
+
+function isIphoneXrSize() {
+    return SCREEN_HEIGHT == 896 || SCREEN_WIDTH == 896;
+}
 
 export const colors = {
     default: {
@@ -10,6 +26,7 @@ export const colors = {
         primaryColor: 'black',
         secondaryColor: 'darkgray',
         tertiaryColor: 'lightgray',
+        white: 'white',
         black: 'black',
         blue: '#41a4ea',
         red: '#e74c3c',
@@ -66,17 +83,5 @@ export const headerStyles = StyleSheet.create({
     headerTextRight:{
         paddingRight: 20,
         justifyContent: 'center',
-    },
-})
-
-export const buttonStyles = StyleSheet.create({
-    addButton: {
-        borderWidth: 1,
-        backgroundColor: colors.default.blue,
-        borderColor: colors.default.blue,
-        borderRadius: 25,
-        paddingHorizontal: 15,
-        paddingVertical: 3,
-        marginRight: 22.5, opacity: 0.25,
     },
 })
