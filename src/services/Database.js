@@ -10,6 +10,7 @@ import Tag from '../models/Tag';
 import WordSeries from '../models/WordSeries';
 import WordTag from '../models/WordTag';
 import WordSynonym from '../models/WordSynonym';
+import { DeviceEventEmitter } from 'react-native';
 
 const DATABASE_NAME = 'db.db';
 
@@ -24,6 +25,7 @@ class Database {
             if (file.exists == false) {
                 this.createDatabase();
                 console.log('Database intialized');
+                DeviceEventEmitter.emit("database_changed");
             }
         });
     }
