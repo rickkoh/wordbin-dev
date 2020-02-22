@@ -4,6 +4,7 @@ const COLUMN_TEXT = 'word_text';
 const COLUMN_PRONUNCIATION = 'word_pronunciation';
 const COLUMN_ORIGIN = 'word_origin';
 const COLUMN_PRIORITY = "word_priority";
+const COLUMN_HIDDEN = "word_hidden";
 const COLUMN_DATETIMEADDED = "word_datetimeadded";
 
 const CREATE_WORD_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE + " (" +
@@ -12,7 +13,8 @@ const CREATE_WORD_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE + " (" +
 	COLUMN_PRONUNCIATION + " TEXT, " +
 	COLUMN_ORIGIN + " TEXT, " +
 	COLUMN_PRIORITY + " TEXT, " +
-	COLUMN_DATETIMEADDED + " TEXT NOT NULL" +
+    COLUMN_HIDDEN + " INTEGER, " +
+    COLUMN_DATETIMEADDED + " TEXT NOT NULL" +
 ")";
 const INSERT_WORD_QUERY = "INSERT INTO " + TABLE + " (" + COLUMN_TEXT + ", " + COLUMN_PRONUNCIATION + ", " + COLUMN_ORIGIN + ", " + COLUMN_DATETIMEADDED + ") VALUES (?, ?, ?, datetime('now'))";
 const DELETE_WORD_QUERY = "DELETE FROM " + TABLE + " WHERE " + COLUMN_ID + " = ?";

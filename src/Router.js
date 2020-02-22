@@ -44,9 +44,12 @@ const HomeStack = createStackNavigator(
 // Drawer Navigator
 const DrawerNavigator = createDrawerNavigator({
     Home: HomeStack,
-    Browse: {
-        screen: Browse
-    },
+    // Profile: {
+        // screen: Profile
+    // },
+    // Browse: {
+        // screen: Browse
+    // },
     //AddWord: {
         //screen: AddWordScreen,
         //navigationOptions: {

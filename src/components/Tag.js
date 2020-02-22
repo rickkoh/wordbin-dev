@@ -32,9 +32,10 @@ class Tag extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
+        alignItems: 'center',
         paddingHorizontal: 2,
         borderWidth: 1,
-        backgroundColor: colors.default.backgroundColor,
+        backgroundColor: 'white',
         borderColor: colors.default.lightgray
     },
     tagText: {

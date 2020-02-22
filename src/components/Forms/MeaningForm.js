@@ -2,8 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Text, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import Modal from 'react-native-modal';
 
-import { colors } from '../../Styles';
-import { SCREEN_WIDTH } from '../../Measurements';
+import { colors, SCREEN_WIDTH } from '../../Styles';
 
 class MeaningForm extends React.Component {
 
@@ -26,24 +25,48 @@ class MeaningForm extends React.Component {
         // onAntonymsChange
 
         // onMeaningIndexChange
-
-        // TODO:
-        // X Modal
-        // X Synonym values
-        // X Antonym values
     }
 
     scrollToIndex = (index, animated) => {
-        // Scroll to index
+        // Ensure index is within range
         if (index > -1 && index < this.props.data.length) {
+            // Scroll to index
             this.flatList.scrollToIndex({animated: animated, index: index});
-        }
+        } 
     }
 
     onViewableItemsChanged = ({ viewableItems }) => {
-        // Update index
-        this.setState({ meaningIndex: viewableItems[0].index + 1 });
+        // Update index changed
+        this.setState({ meaningIndex: viewableItems[0].index });
         this.props.onMeaningIndexChange(viewableItems[0].index);
+
+        // Autofocus
+        if (this.props.autofocus && viewableItems.length <= 1) {
+            // MeaningTextInput
+            if (this.meaningHasFocus) this[`meaningTextInput${viewableItems[0].index}`].focus();
+            // ClassificationTextInput
+            else if (this.classificationHasFocus) this[`classificationTextInput${viewableItems[0].index}`].focus();            
+        }
+    }
+
+    onMeaningTextFocus = () => {
+        this.props.onMeaningTextFocus ? this.props.onMeaningTextFocus() : null;
+        this.meaningHasFocus = true;
+    }
+
+    onMeaningTextBlur = () => {
+        this.props.onMeaningTextBlur ? this.props.onMeaningTextBlur() : null;
+        this.meaningHasFocus = false;
+    }
+
+    onClassificationTextFocus = () => {
+        this.props.onClassificationTextFocus ? this.props.onClassificationTextFocus() : null;
+        this.classificationHasFocus = true;
+    }
+
+    onClassificationTextBlur = () => {
+        this.props.onClassificationTextBlur ? this.props.onClassificationTextBlur() : null;
+        this.classificationHasFocus = false;
     }
 
     _renderMeaningColumn = ({item, index}) => {
@@ -51,20 +74,27 @@ class MeaningForm extends React.Component {
             <View style={styles.container}>
                 <TextInput
                     multiline
+                    ref={ref => this[`meaningTextInput${index}`] = ref}
+                    hasFocus={false}
                     style={styles.meaningTextInput}
                     placeholder="Meaning of word"
                     value={item.meaning_text}
-                    onFocus={this.props.onMeaningTextFocus}
+                    onFocus={this.onMeaningTextFocus}
+                    onBlur={this.onMeaningTextBlur}
                     onChangeText={(text) => this.props.onMeaningTextChange(text, index)}
                 />
                 <View style={styles.rowContainer}>
                     <TextInput
+                        ref={ref => this[`classificationTextInput${index}`] = ref}
                         blurOnSubmit={false}
                         style={styles.classificationTextInput}
                         placeholder="Classification"
                         value={item.meaning_classification}
-                        onChangeText={(text) => this.props.onClassificationTextChange(text, index)}/>
-                    <TouchableOpacity onPress={() => console.log('open modal')}>
+                        onFocus={this.onClassificationTextFocus}
+                        onBlur={this.onClassificationTextBlur}
+                        onChangeText={(text) => this.props.onClassificationTextChange(text, index)}
+                    />
+                    <TouchableOpacity onPress={() => this.props.toggleVisibility()}>
                         <Text style={{color: colors.default.blue}}>More options</Text>
                     </TouchableOpacity>
                 </View>
@@ -80,6 +110,7 @@ class MeaningForm extends React.Component {
         return(
             <FlatList
                 ref={(ref) => { this.flatList = ref }}
+                keyboardShouldPersistTaps="always"
                 horizontal
                 pagingEnabled
                 style={styles.container}

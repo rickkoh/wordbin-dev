@@ -9,8 +9,8 @@ class PillButton extends React.Component {
             <View style={(this.props.enabled || this.props.enabled == undefined) ? styles.enabled : styles.disabled}>
                 <TouchableOpacity
                     onPress={(this.props.enabled || this.props.enabled == undefined) ? this.props.onPress : null}
-                    style={[styles.defaultPillButtonStyle, this.props.style]}>
-                    <Text numberOfLines={1} style={{color: 'white', fontSize: 16}}>{this.props.text}</Text>
+                    style={[styles.defaultPillButtonStyle, this.props.style, this.props.backgroundColor == null ? null : {backgroundColor: this.props.backgroundColor}]}>
+                    <Text numberOfLines={1} style={[styles.defaultTextStyle, this.props.textColor == null ? null : {color: this.props.textColor}]}>{this.props.text}</Text>
                 </TouchableOpacity>
             </View>
         )
@@ -26,6 +26,10 @@ const styles = StyleSheet.create({
         backgroundColor: colors.default.blue,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    defaultTextStyle: {
+        color: colors.default.white,
+        fontSize: 16,
     },
     enabled: {
         opacity: 1,

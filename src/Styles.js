@@ -22,14 +22,15 @@ function isIphoneXrSize() {
 
 export const colors = {
     default: {
-        backgroundColor: '#fefefe',
+        backgroundColor: '#F8F8F7',
         primaryColor: 'black',
         secondaryColor: 'darkgray',
         tertiaryColor: 'lightgray',
         white: 'white',
         black: 'black',
-        blue: '#41a4ea',
         red: '#e74c3c',
+        blue: '#41a4ea',
+        green: 'green',
         lightred: '#e86e6e',
         gray: '#d2d2d8',
         lightgray: '#DFE1E5',

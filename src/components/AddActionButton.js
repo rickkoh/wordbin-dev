@@ -1,5 +1,4 @@
 import React from 'react';
-import { View } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import { withNavigation } from 'react-navigation';
 

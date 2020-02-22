@@ -54,7 +54,7 @@ class SideMenu extends React.Component {
                         <FlatList
                             data={this.state.data}
                             renderItem={({item}) => 
-                                <View style={{paddingLeft: 5, backgroundColor: colors.default.blue}}>
+                                <View style={{paddingLeft: 5, backgroundColor: colors.default.blue, flex: 1}}>
                                     <TouchableOpacity
                                         style={{padding: 10, paddingVertical: 12.5, backgroundColor: colors.default.backgroundColor}}
                                     >
@@ -70,18 +70,18 @@ class SideMenu extends React.Component {
 
                 </View>
 
-                <Modal  isVisible={this.state.isModalVisible}
-                        onBackdropPress={() => {
-                            console.log('test');
-                            this.setState(prevState => ({
-                                isModalVisible: false,
-                                newSeriesTitle: '',
-                            }
-                            ))
-                        }}
-                        onShow={() => {
-                            this.textInput.focus();
-                        }}
+                <Modal isVisible={this.state.isModalVisible}
+                    onBackdropPress={() => {
+                        console.log('test');
+                        this.setState(prevState => ({
+                            isModalVisible: false,
+                            newSeriesTitle: '',
+                        }
+                        ))
+                    }}
+                    onShow={() => {
+                        this.textInput.focus();
+                    }}
                 >
                     <View style={{backgroundColor: colors.default.backgroundColor, borderRadius: 10, padding: 15}}>
                         <Text style={{paddingHorizontal: 5, fontSize: 16}}>Name of series</Text>

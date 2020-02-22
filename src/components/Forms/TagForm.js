@@ -10,9 +10,13 @@ import { SCREEN_WIDTH } from '../../Measurements';
 class TagForm extends React.Component {
     constructor(props) {
         super(props);
-        
-        // Available props
-        // Tags 
+
+        // Props
+        // data
+        // onChangeText
+        // onPress
+        // onBlur
+        // onFocus
     }
 
     scrollToIndex = (index, animated) => {

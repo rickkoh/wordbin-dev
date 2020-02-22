@@ -3,16 +3,11 @@ import { View, StyleSheet, KeyboardAvoidingView, TextInput, Text } from 'react-n
 
 import Modal from 'react-native-modal';
 
-import PillButton from '../PillButton';
-
-import { colors } from '../../Styles';
+import Header from '../../components/Header';
+import { headerStyles, colors } from '../../Styles';
+import TextButton from '../TextButton';
 
 class MeaningFormModal extends React.Component {
-
-    constructor(props) {
-        super(props);
-
-    }
 
     render() {
         return(
@@ -21,15 +16,17 @@ class MeaningFormModal extends React.Component {
                 swipeDirection={['down']}
                 swipeThreshold={300}
                 onSwipeComplete={this.props.toggleVisibility}
-                onShow={() => this.wordInput.focus()}
+                // onShow={() => this.wordInput.focus()}
                 style={{margin: 0}}
             >
                 <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
                     <View style={styles.modal}>
-                        <View style={styles.header}>
-                            <PillButton text="Done" onPress={this.props.toggleVisibility}/>
-                        </View>
-                        <Text>{this.props.meaning.meaning_text}</Text>
+                        <Header
+                            headerRight={
+                                <TextButton text="Done" style={headerStyles.headerButtonRight} onPress={this.props.toggleVisibility}/>
+                            }
+                        />
+                        <Text style={{fontSize: 24, marginLeft: 20, color: this.props.meaning.meaning_text == undefined ? colors.default.gray : colors.default.black}}>{this.props.meaning.meaning_text == undefined ? "Meaning of word" : this.props.meaning.meaning_text}</Text>
                         <TextInput
                             multiline
                             ref={ref => this.wordInput = ref}
@@ -70,9 +67,9 @@ const styles = StyleSheet.create({
     },
     modal: {
         flex: 1,
-        marginTop: 37.5,
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
+        // marginTop: 37.5,
+        // borderTopLeftRadius: 30,
+        // borderTopRightRadius: 30,
         backgroundColor: colors.default.backgroundColor
     },
     header: {
@@ -90,6 +87,7 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     textInput: {
+        flex: 1,
         marginTop: 20,
         marginHorizontal: 20,
         fontSize: 16
