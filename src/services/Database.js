@@ -10,6 +10,7 @@ import Tag from '../models/Tag';
 import WordSeries from '../models/WordSeries';
 import WordTag from '../models/WordTag';
 import WordSynonym from '../models/WordSynonym';
+import MeaningSentence from '../models/MeaningSentence';
 import { DeviceEventEmitter } from 'react-native';
 
 const DATABASE_NAME = 'db.db';
@@ -20,9 +21,11 @@ db = SQLite.openDatabase(DATABASE_NAME);
 
 class Database {
 
+    // Connect to the database
+    // Ensure that database file is created
     initializeDatabase() {
         FileSystem.getInfoAsync(FileSystem.documentDirectory + "SQLite/" + DATABASE_NAME).then(file => {
-            if (file.exists == false) {
+            if (!file.exists) {
                 this.createDatabase();
                 console.log('Database intialized');
                 DeviceEventEmitter.emit("database_changed");
@@ -30,6 +33,7 @@ class Database {
         });
     }
 
+    // Create the database
     createDatabase() {
         db.transaction(tx => {
             tx.executeSql(Word.Query.CREATE_WORD_TABLE);
@@ -73,20 +77,29 @@ class Database {
             console.log(error);
         });
 
+        db.transaction(tx => {
+            tx.executeSql(MeaningSentence.Query.CREATE_MEANINGSENTENCE_TABLE);
+        }, error => {
+            console.log(error);
+        })
+
         console.log("Database created.");
     }
 
+    // Delete the database
     deleteDatabase() {
         FileSystem.deleteAsync(FileSystem.documentDirectory + "SQLite/" + DATABASE_NAME);
         console.log("Database deleted.");
     }
 
+    // Reset the database
     resetDatabase() {
         this.deleteDatabase();
         this.createDatabase();
         console.log("Database resetted.");
     }
 
+    // Add word to the database
     addWord(word) {
         return new Promise((resolve, reject) => {
             word_id = undefined;
@@ -104,6 +117,7 @@ class Database {
         })
     }
 
+    // Delete a word from the database
     deleteWord(word_id) {
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
@@ -122,6 +136,7 @@ class Database {
         })
     }
 
+    // Add meaning(s) to the word object
     addMeaning(meaning) {
         return new Promise((resolve, reject) => {
             meaning_id = undefined;
@@ -139,6 +154,7 @@ class Database {
         })
     }
 
+    // Delete all the meaning from the word object
     deleteMeaningByWordId(word_id) {
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
@@ -155,6 +171,7 @@ class Database {
         })
     }
 
+    // Add a series to the database
     addSeries(series_title) {
         return new Promise((resolve, reject) => {
             series_id = undefined;
@@ -172,6 +189,7 @@ class Database {
         })
     }
 
+    // Add a word series to the database
     addWordSeries(word_id, series_id) {
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
@@ -188,6 +206,25 @@ class Database {
         })
     }
 
+    // Add a sentence example to the meaning object
+    addMeaningSentence(meaning_id, meaningsentence) {
+        return new Promise((resolve, reject) => {
+            meaningsentence_id = undefined;
+            db.transaction(tx => {
+                tx.executeSql(
+                    MeaningSentence.Query.INSERT_MEANINGSENTENCE_QUERY,
+                    [meaning_id, meaningsentence.meaningsentence_text],
+                    (_, { insertId }) => meaningsentence_id = insertId
+                );
+            }, error => {
+                reject(error);
+            }, success => {
+                resolve(meaningsentence_id);
+            })
+        })
+    }
+
+    // Add a tag to the database
     addTag(tag) {
         return new Promise((resolve, reject) => {
             tag_id = undefined;
@@ -205,6 +242,7 @@ class Database {
         })
     }
 
+    // Link the tag to a word object
     addWordTag(word_id, tag_id) {
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
@@ -221,6 +259,7 @@ class Database {
         })
     }
 
+    // Get all the words from the database
     getWords() {
         return new Promise((resolve, reject) => {
             result = undefined;
@@ -238,6 +277,7 @@ class Database {
         })
     }
 
+    // Get a word from the database
     getWord(word_id) {
         return new Promise((resolve, reject) => {
             result = undefined;
@@ -255,6 +295,7 @@ class Database {
         })
     }
 
+    // Get all the words based on the tag from the database
     getWordsByTags(tag_id) {
         return new Promise((resolve, reject) => {
             result = undefined;
@@ -272,6 +313,7 @@ class Database {
         })
     }
 
+    // Get all the meanings of the word object
     getMeanings(word_id) {
         return new Promise((resolve, reject) => {
             result = undefined;
@@ -289,6 +331,25 @@ class Database {
         })
     }
 
+    // Get all the sentence examples of the meaning object
+    getMeaningSentence(meaning_id) {
+        return new Promise((resolve, reject) => {
+            result = undefined;
+            db.transaction(tx => {
+                tx.executeSql(
+                    meaningnSen .Query.SELECT_ALL_MEANINGSENTENCE_QUERY,
+                    [meaning_id],
+                    (_, {rows: { _array } }) => result = _array
+                );
+            }, error => {
+                reject(error);
+            }, success => {
+                resolve(result);
+            })
+        })
+    }
+
+    // Get all the series from the database
     getSeries() {
         return new Promise((resolve, reject) => {
             result = undefined;
@@ -306,6 +367,7 @@ class Database {
         })
     }
 
+    // Get all the tags from the database based on the tag title
     getTag(tag_title) {
         return new Promise((resolve, reject) => {
             result = undefined;
@@ -323,6 +385,7 @@ class Database {
         })
     }
 
+    // Get all the tags from the database
     getTags() {
         return new Promise((resolve, reject) => {
             result = undefined;
@@ -340,6 +403,7 @@ class Database {
         })
     }
 
+    // Get all the words in the series
     getSeriesWords(series_id) {
         return new Promise((resolve, reject) => {
             result = undefined;
@@ -357,6 +421,7 @@ class Database {
         })
     }
 
+    // Get all the series the word belongs to
     getWordSeries(word_id) {
         return new Promise((resolve, reject) => {
             result = undefined;
@@ -374,6 +439,7 @@ class Database {
         })
     }
 
+    // Get all the tags of the word
     getWordTags(word_id) {
         return new Promise((resolve, reject) => {
             result = undefined;
@@ -391,6 +457,7 @@ class Database {
         })
     }
 
+    // Get all the words that have the tag
     getTagWords(tag_id) {
         return new Promise((resolve, reject) => {
             result = undefined;
@@ -408,6 +475,7 @@ class Database {
         })
     }
 
+    // Get all the word synonym
     getWordSynonym(meaning_id) {
         return new Promise((resolve, reject) => {
             result = undefined;
@@ -424,7 +492,8 @@ class Database {
             });
         })
     }
-
+    
+    // Print the database location
     printDatabaseLocation() {
         console.log(FileSystem.documentDirectory + "SQLite/" + DATABASE_NAME);
     }
