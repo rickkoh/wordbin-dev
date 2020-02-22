@@ -1,8 +1,9 @@
 import React from 'react';
-import { DeviceEventEmitter, KeyboardAvoidingView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
+import { DeviceEventEmitter, ScrollView, FlatList, NetInfo, KeyboardAvoidingView, Text, View, TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
+import Modal from 'react-native-modal';
 
-import { colors, headerStyles } from '../Styles';
+import { colors, headerStyles, SCREEN_HEIGHT, SCREEN_WIDTH } from '../Styles';
 
 import Header from '../components/Header';
 import PillButton from '../components/PillButton';
@@ -36,12 +37,23 @@ class AddWordScreen extends React.Component {
                     meaning_datetimecreated: undefined,
                 }
             ],
+            meaningsentence: [
+                {
+                    meaningsentence_id: undefined,
+                    meaningsentence_meaning_id: undefined,
+                    meaningsentence_text: undefined,
+                    meaningsentence_datetimecreated: undefined,
+                }
+            ],
             tags: [
                 {
                     tag_title: undefined,
                 }
             ],
-            meaningCurrentIndex: undefined,
+            apiWord: {
+                word_text: "",
+            },
+            meaningCurrentIndex: 0,
             keyboardBarType: undefined,
             wordIsValidated: false,
             wordHasAPIdata: false,
@@ -50,6 +62,7 @@ class AddWordScreen extends React.Component {
         }
     }
 
+    // Function executes everytime the page is updated
     // Perform validation
     componentDidUpdate(prevProps, prevState) {
         // Validate Word
@@ -60,6 +73,7 @@ class AddWordScreen extends React.Component {
         }
     }
 
+    // Focus on the caret on the word input when page is loaded
     componentDidMount() {
         this.wordInput.focus();
     }
@@ -69,6 +83,7 @@ class AddWordScreen extends React.Component {
         DeviceEventEmitter.emit("database_changed");
     }
 
+    // Handle meaning change
     handleMeaningChange = (text, index) => {
         meaning = this.state.meaning;
         meaning[index].meaning_text = text;
@@ -87,24 +102,27 @@ class AddWordScreen extends React.Component {
         this.setState({ meaning: meaning });
     }
 
+    // Handle meaning sentence example change
     handleMeaningSentenceExampleChange = (text , index) => {
         meaning = this.state.meaning;
         meaning[index].sentenceexample
     }
 
+    // Handle classification change
     handleClassificationChange = (text, index) => {
         meaning = this.state.meaning;
         meaning[index].meaning_classification = text;
-        
         this.setState({ meaning: meaning });
     }
 
+    // Remove meaning
     removeMeaning = () => {
         meaning = this.state.meaning;
         meaning.splice(this.state.meaningCurrentIndex, 1);
-        this.setState({ meaning: meaning })
+        this.setState({ meaning: meaning });
     }
 
+    // Handle tag change
     handleTagChange = (text) => {
         if (text.length > 1 && text[text.length-1] == " "){
             this.addTag();
@@ -115,11 +133,13 @@ class AddWordScreen extends React.Component {
         }
     }
 
+    // Handle origin change
     handleOriginChange = (text) => {
         this.state.word.word_origin = text;
         this.setState({ word: this.state.word });
     }
 
+    // Add tag
     addTag = () => {
         tags = this.state.tags;
         text = tags[tags.length-1].tag_title;
@@ -129,17 +149,108 @@ class AddWordScreen extends React.Component {
         }
     }
 
+    // Remove tag
     removeTag = (index) => {
         tags = this.state.tags;
         tags.splice(index, 1);
         this.setState({ tags: tags });
     }
 
-    toggleModalVisibility = () => {
+    // Toggle 
+    toggleMeaningModalVisibility = () => {
+        // Toggle Modal Visibility
+        // True to display, vice versa
         console.log('toggling');
-        this.setState(prevState => ({isModalVisible: !prevState.isModalVisible}))
+        this.setState(prevState => ({isMeaningModalVisible: !prevState.isMeaningModalVisible}))
     }
 
+    toggleAPIModalVisibility = () => {
+        this.setState(prevState => ({isAPIModalVisible: !prevState.isAPIModalVisible}))
+    }
+
+    meaningCurrentIndexChanged = (index) => {
+        this.setState({meaningCurrentIndex: index})
+    }
+
+    apiButtonPressed = () => {
+        NetInfo.getConnectionInfo().then((connectionInfo) => {
+            if (connectionInfo.type != 'none') {
+                // Replace spaces with dashes
+                word = this.state.word.word_text.split(" ").join("-");
+                console.log(word);
+                fetch('https://googledictionaryapi.eu-gb.mybluemix.net/?define='+word).then((response) => 
+                    // Jsonify Data
+                    response.json()
+                )
+                .then((responseJson) => {
+                    // Handle Data
+                    this.openAPIModal(responseJson);
+                }).catch((error) => {
+                    // Handle Fail
+                    console.log(error);
+                })
+            }
+        });
+    }
+
+    // Opens up the API modal
+    openAPIModal = (responseJson) => {
+        this.toggleAPIModalVisibility();
+        // Convert responseJson to word object
+        // Use word card to display
+
+        // Create objects
+        Word = {};
+        Meaning = [];
+        
+        console.log(responseJson);
+
+        // Convert responseJson to objects
+        responseJson.forEach((word) => {
+            // Retrieve word_text
+            Word.word_text = word["word"];
+            Word.word_pronunciation = word["phonetic"];
+            Word.word_origin = word["origin"];
+
+            // Retrieve meaning
+            for (var classification in word["meaning"]) {
+                word["meaning"][classification].forEach((meaning) => {
+                    Meaning.push({meaning_text: meaning["definition"], meaning_classification: classification})
+                })
+            }
+        });
+        // Objects obtained
+        this.setState({
+            apiWord: Word,
+            apiMeaning: Meaning
+        });
+        console.log(this.state.apiWord);
+    }
+
+    // Handle clear button pressed
+    clearButtonPressed = () => {
+        // Get the current keyboard state
+        // Remove state.item based on current keyboard state
+        console.log(this.state.keyboardBarType);
+        if (this.state.keyboardBarType == "word") this.setState((prevState) => ({word: { ...prevState.word, word_text: undefined}}))
+        else if (this.state.keyboardBarType == "pronunciation") this.setState((prevState) => ({word: { ...prevState.word, word_pronunciation: undefined}}))
+        else if (this.state.keyboardBarType == "meaning") {
+            if (this.state.meaningCurrentIndex == this.state.meaning.length-1) {
+                meaning = this.state.meaning;
+                meaning[this.state.meaningCurrentIndex].meaning_text = undefined;
+                this.setState({ meaning: meaning });
+            } else {
+                this.removeMeaning();
+            }
+        } 
+        else if (this.state.keyboardBarType == "classification") {
+            meaning = this.state.meaning;
+            meaning[this.state.meaningCurrentIndex].meaning_classification = undefined;
+            this.setState({ meaning: meaning });
+        }
+    }
+
+    // Handle add button pressed
     addButtonPressed = () => {
 
         async function asyncForEach(array, callback) {
@@ -183,31 +294,57 @@ class AddWordScreen extends React.Component {
 
     }
 
+    test = () => {
+        console.log(this.state);
+        this.setState({isMeaningModalVisible: true})
+        // this.insertAPIDataButtonPressed();
+    }
+
+    insertAPIDataButtonPressed = () => {
+        Word = this.state.apiWord;
+        Word.word_text = this.state.word.word_text;
+        Meaning = this.state.apiMeaning;
+        this.setState({
+            word: Word,
+            meaning: Meaning,
+            isAPIModalVisible: false
+        });
+    }
+
     // TODO: Clean this chunk of code
     renderKeyboardBar = () => {
         return(
             <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
                 <View style={{flex: 1, flexDirection: 'row'}}>
-                    <TouchableOpacity>
-                        <Icon name='package' type='feather' color={colors.default.blue} opacity={this.state.wordHasAPIdata ? 1 : 0.25}/>
+                    {
+                        // API Button
+                        // Retrieve api data when button is pressed
+                    }
+                    <TouchableOpacity onPress={this.apiButtonPressed}>
+                        <Icon name='google' type='antdesign' color={colors.default.blue} opacity={this.state.wordHasAPIdata ? 1 : 1}/>
                     </TouchableOpacity>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-                    <TouchableOpacity style={{marginRight: 15}} onPress={() => this.setState({ word: {word_text: undefined, datetimeadded: undefined} })}>
+                    {
+                        // Clear button how am I going to deal with it
+                    }
+                    <TouchableOpacity style={{marginRight: 15}}
+                        onPress={() => this.clearButtonPressed()}
+                    >
                         <Text style={{fontSize: 16, color: colors.default.blue}}>Clear</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
                     <TouchableOpacity onPress={() => {this.meaningForm.scrollToIndex(this.state.meaningCurrentIndex - 1)}}>
-                        <Icon name='chevron-left' color={colors.default.blue} size={22} opacity={0.25}/>
+                        <Icon name='chevron-left' color={colors.default.blue} size={22} opacity={1}/>
                     </TouchableOpacity>
                     <Text style={{fontSize: 16, color: colors.default.blue}}>{this.state.meaningCurrentIndex + 1}/{this.state.meaning.length}</Text>
                     <TouchableOpacity onPress={() => {this.meaningForm.scrollToIndex(this.state.meaningCurrentIndex + 1)}}>
-                        <Icon name='chevron-right' color={colors.default.blue} size={22} opacity={0.25}/>
+                        <Icon name='chevron-right' color={colors.default.blue} size={22} opacity={1}/>
                     </TouchableOpacity>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end'}}>
-                    <TouchableOpacity onPress={() => this.setState({isModalVisible: true})}>
+                    <TouchableOpacity onPress={() => this.test()}>
                         <Icon name='add' color={colors.default.blue}/>
                     </TouchableOpacity>
                 </View>
@@ -246,36 +383,85 @@ class AddWordScreen extends React.Component {
                 <PronunciationInput
                     value={this.state.word.word_pronunciation}
                     onChangeText={(text) => this.setState((prevState) => ({word: { ...prevState.word, word_pronunciation: text}}))}
-                    onFocus={() => this.setState({keyboardBarType: 'word'})}
+                    onFocus={() => this.setState({keyboardBarType: 'pronunciation'})}
                 />
                 <MeaningForm
+                    autofocus
                     ref={(ref) => { this.meaningForm = ref }}
                     data={this.state.meaning}
-                    onMeaningIndexChange={(index) => this.setState({meaningCurrentIndex: index})}
+                    onMeaningIndexChange={(index) => this.meaningCurrentIndexChanged(index)}
                     onMeaningTextChange={this.handleMeaningChange}
                     onClassificationTextChange={this.handleClassificationChange}
-                    onFocus={() => this.setState({keyboardBarType: 'meaning'})}
+                    onMeaningTextFocus={() => this.setState({keyboardBarType: 'meaning'})}
+                    onClassificationTextFocus={() => this.setState({keyboardBarType: 'classification'})}
+                    toggleVisibility={this.toggleMeaningModalVisibility}
                 />
                 <TagForm
                     value={this.state.tags[this.state.tags.length-1].tag_title}
                     data={this.state.tags}
                     onChangeText={this.handleTagChange}
                     onPress={this.removeTag}
-                    onFocus={() => this.setState({keyboardBarType: 'tag'})}
                     onBlur={this.addTag}
+                    onFocus={() => this.setState({keyboardBarType: 'tag'})}
                 />
                 <KeyboardBar
                     renderContent={this.renderKeyboardBar()}
                     enabled={this.state.isValidated}
                 />
-
                 <MeaningFormModal
-                    meaning={this.state.meaning[0]}
+                    meaning={this.state.meaning[this.state.meaningCurrentIndex]}
                     keyboardBar={this.renderKeyboardBar()}
-                    toggleVisibility={this.toggleModalVisibility}
-                    isVisible={this.state.isModalVisible} toggleVisibility={this.toggleModalVisibility}
+                    toggleVisibility={this.toggleMeaningModalVisibility}
+                    isVisible={this.state.isMeaningModalVisible}
                 />
+                <Modal
+                    onSwipeComplete={this.toggleAPIModalVisibility}
+                    isVisible={this.state.isAPIModalVisible}
+                    onBackdropPress={() => {
+                        this.setState(prevState => ({
+                            isAPIModalVisible: false,
+                        }
+                        ))
+                    }}
+                    style={{justifyContent: 'flex-end', margin: 0}}
+                >
+                    <View style={{backgroundColor: colors.default.white, borderTopStartRadius: 20, borderTopEndRadius: 20, padding: 20, paddingTop: 0, height: SCREEN_HEIGHT*0.80}}>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                            <Text style={{fontSize: 30, maxWidth: SCREEN_WIDTH-105}} numberOfLines={1}>{this.state.word.word_text}</Text>
+                            <TouchableOpacity style={{marginLeft: 10, marginRight: 5, paddingVertical: 5}} onPress={this.insertAPIDataButtonPressed}>
+                                <Icon name="arrow-up" type="material-community" size="20" color={colors.default.blue} reverse></Icon>
+                            </TouchableOpacity>
+                        </View>
+                        <ScrollView>
+                            <Text>{this.state.word.word_text}</Text>
+                            <Text style={{marginBottom: 5}}>{this.state.apiWord !== 'undefeinfed' ? this.state.apiWord.word_pronunciation : ""}</Text>
+                            <FlatList
+                                data={this.state.apiMeaning}
+                                renderItem={this.renderMeaning}
+                                keyExtractor={(item, index) => index.toString()}
+                                listKey={(item, index) => index.toString()}
+                            />
+                        </ScrollView>
+                    </View>
+                </Modal>
             </KeyboardAvoidingView>
+        )
+    }
+
+    renderMeaning = ({item, index}) => {
+        synonym = [{text: "Synonyms:"}]
+        return(
+            <View style={{flexDirection: 'row', marginBottom: 5}}>
+                <View style={{marginRight: 60}}>
+                    {item.meaning_classification == undefined ? null : (
+                        <Text style={{fontSize: 12, marginBottom: 5, color: 'gray'}}>{item.meaning_classification}</Text>
+                    )}
+                    <Text style={{fontSize: 14, marginBottom: 7.5}}>{item.meaning_text}</Text>
+                </View>
+                <View style={{backgroundColor: 'pink'}}>
+
+                </View>
+            </View>
         )
     }
 }

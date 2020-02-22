@@ -3,7 +3,7 @@ import { View, StyleSheet, ListView, Text, Animated } from 'react-native';
 
 import Header from '../components/Header';
 import PillButton from '../components/PillButton';
-import TextList from '../components/TextList';
+import TextList from '../prototypes/TextList';
 
 import { colors } from '../Styles';
 

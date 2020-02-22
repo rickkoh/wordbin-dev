@@ -1,17 +1,18 @@
 import React from 'react';
-import { Text, View, TouchableOpacity, DeviceEventEmitter } from 'react-native';
+import { Text, View, TouchableOpacity, DeviceEventEmitter, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 
+// Ignore error warnings
 import ignoreWarnings from 'react-native-ignore-warnings';
 
-import { headerStyles, colors } from '../Styles';
+import { headerStyles, colors, SCREEN_HEIGHT } from '../Styles';
 
 import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
 
-import AddWordModal from './AddWordModal';
+// import AddWordModal from './AddWordModal';
 
-import Header from '../components/Header';
-import WordBrowser from '../components/WordBrowser';
+import WordCard from '../components/WordCard';
+import AddWordCard from '../components/AddWordCard';
 import AddActionButton from '../components/AddActionButton';
 import database from '../services/Database';
 
@@ -116,64 +117,111 @@ export default class HomeScreen extends React.Component {
         // this.toggleModalVisibility();
     }
 
-    // Render
-    render() {
-        console.log("render")
-        return (
-            <View style={{flex: 1, backgroundColor: colors.default.backgroundColor}}>
-                <Header
-                    headerLeft={
-                        <TouchableOpacity
-                            onPress={() => this.props.navigation.openDrawer()}
-                            style={headerStyles.headerButtonLeft}>
-                            <Icon name='menu' color={colors.default.primaryColor}/>
-                        </TouchableOpacity>
-                    }
-                    headerTitle={
-                        <Text style={headerStyles.headerTitle} onPress={() => this.refreshData()}>
-                            {this.state.title}
-                        </Text>
-                    }
-                    headerRight={
-                        <TouchableOpacity
-                            onPress={this.test}
-                            style={headerStyles.headerButtonRight}>
-                            <Icon name='grid' type="entypo" color={colors.default.primaryColor}/>
-                            <Menu ref={(ref) => this._menu = ref}
-                                style={{backgroundColor: 'black'}}
-                            >
-                                <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Alphabet</Text></MenuItem>
-                                <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Latest</Text></MenuItem>
-                                <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Earliest</Text></MenuItem>
-                                <MenuDivider color={colors.default.lightgray} />
-                                <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Custom</Text></MenuItem>
-                            </Menu>
-                        </TouchableOpacity>
-                    }
-                />
-                {this.state.Words == undefined || this.state.Words.length <= 0 ?
-                (<View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                    <TouchableOpacity
-                        onPress={() => this.props.navigation.navigate('AddWord')}
+    header() {
+        return(
+            <View style={[styles.header, styles.boxWithShadow]}>
+                {
+                    // Header
+                }
+                <TouchableOpacity
+                    style={{marginLeft: 20}}
+                    onPress={() => this.props.navigation.openDrawer()}
+                >
+                    <Icon name='menu' color={colors.default.primaryColor}/>
+                </TouchableOpacity>
+                <Text style={[headerStyles.headerTitle, {maxWidth: 200}]} numberOfLines={1} onPress={() => this.refreshData()}>
+                    {this.state.title}
+                </Text>
+                <TouchableOpacity
+                    onPress={this.test}
+                    style={{marginRight: 20}}>
+                    <Icon name='grid' type="entypo" color={colors.default.primaryColor}/>
+                    <Menu ref={(ref) => this._menu = ref}
+                        style={{backgroundColor: 'black'}}
                     >
-                        <Text style={{color: colors.default.blue, fontSize: 16, marginBottom: 100, fontWeight: 'bold'}}>Add Your First Word</Text>
-                    </TouchableOpacity>
-                </View>) :
-                (<WordBrowser
-                    onCardPress={() => this.props.navigation.navigate('AddWord')}
-                    data={this.state.Words}
-                />)}
-                <AddActionButton
-                    onPress={() => this.props.navigation.navigate("AddWord")}
-                />
-
-                <AddWordModal
-                    isVisible={this.state.isModalVisible}
-                    toggleVisibility={this.toggleModalVisibility}
-                />
-
+                        <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Alphabet</Text></MenuItem>
+                        <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Latest</Text></MenuItem>
+                        <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Earliest</Text></MenuItem>
+                        <MenuDivider color={colors.default.lightgray} />
+                        <MenuItem onPress={this.hideMenu}><Text style={{color: 'white'}}>Custom</Text></MenuItem>
+                    </Menu>
+                </TouchableOpacity>
             </View>
         )
+    }
 
-    };
+    // Render
+    render() {
+        console.log("render");
+        return(
+            <View style={{flex: 1, backgroundColor: colors.default.backgroundColor}}>
+                {
+                    this.state.Words == undefined ? (
+                        <LoadingPage/>
+                    ) : 
+                    this.state.Words.length <= 0 ? (
+                        <FlatListWithCollapsibleHeader
+                            header={this.header()}
+                            navHeight={44}
+                            containerPaddingTop={10}
+                            data={["Add Word Card"]}
+                            renderItem={() => <AddWordCard onPress={() => this.props.navigation.navigate("AddWord")}/>}
+                        >
+                        </FlatListWithCollapsibleHeader>
+                    ) : (
+                        <FlatListWithCollapsibleHeader
+                            header={this.header()}
+                            navHeight={44}
+                            containerPaddingTop={0}
+                            data={this.state.Words}
+                            renderItem={({item}) => <WordCard word={item} onCardPress={this.props.onCardPress}/>}
+                        />
+                )
+            }
+            <AddActionButton
+                onPress={() => this.props.navigation.navigate("AddWord")}
+            />
+        </View>
+        )
+    }
 }
+
+function LoadingPage() {
+    // Just a loading icon at the middle
+    return(
+        <View style={[styles.container, styles.center]}>
+            <Text>Loading icon here</Text>
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1
+    },
+    center: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    header: {
+        height: 44, borderRadius: 0, marginHorizontal: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.default.white
+    },
+    card: {
+        margin: 10,
+        padding: 10,
+        borderRadius: 10,
+        backgroundColor: colors.default.white,
+        height: SCREEN_HEIGHT * 0.725,
+    },
+    boxWithShadow: {
+        marginBottom: 5,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+        elevation: 3,
+    },
+})
