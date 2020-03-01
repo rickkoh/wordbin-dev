@@ -27,7 +27,8 @@ class WordCard extends React.Component {
         super(props);
 
         this.state = {
-            isModalVisible: false
+            isModalVisible: false,
+            isModalEditable: false,
         }
     }
 
@@ -51,12 +52,115 @@ class WordCard extends React.Component {
         this.setState(prevState => ({isModalVisible: !prevState.isModalVisible}))
     }
 
+    // WordCard is the card itself
+    // It should be editable WordCardModal
+    // and WordCardModal
+
+    renderWordCardModal = () => {
+        return(
+            <Modal
+                onBackdropPress={() => this.setState({isCardModalVisible: false})}
+                isVisible={this.state.isCardModalVisible}
+            >
+                {
+                    // View/Edit Word modal
+                }
+                <View style={{flex: 1, backgroundColor: 'white', marginHorizontali: 20, marginVertical: SCREEN_HEIGHT*0.1, borderRadius: 20, padding: 20}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <TouchableOpacity onPress={() => {
+                            console.log(this.props.word);
+                            this.setState(prevState => ({isModalEditable: !prevState.isModalEditable}));
+                        }}>
+                            <Text style={{fontSize: 18, color: colors.default.blue}}>Edit</Text>
+                        </TouchableOpacity>
+                        <PillButton
+                            text="Done"
+                            onPress={() => this.setState({isCardModalVisible: false})}
+                            style={{marginBottom: 10}}
+                        />
+                    </View>
+                    <ScrollView>
+                        <Text style={{fontSize: 22}}>{this.props.word.word_text}</Text>
+                        <Text>{this.props.word.word_pronunciation}</Text>
+                        <MeaningInformation
+                            data={this.props.word.Meanings}
+                        />
+                        <TagInformation1
+                            data={this.props.word.Tags} 
+                        />
+                    </ScrollView>
+                </View>
+            </Modal>
+        )
+    }
+
+    renderEditableWordCardModal = () => {
+        return(
+            <Modal
+                onBackdropPress={() => this.setState({isCardModalVisible: false})}
+                isVisible={this.state.isCardModalVisible}
+            >
+                {
+                    // View/Edit Word modal
+                }
+                <View style={{flex: 1, backgroundColor: 'white', marginHorizontali: 20, marginVertical: SCREEN_HEIGHT*0.1, borderRadius: 20, padding: 20}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <TouchableOpacity onPress={() => {
+                            console.log(this.props.word);
+                            this.setState(prevState => ({isModalEditable: !prevState.isModalEditable}));
+                        }}>
+                            <Text style={{fontSize: 18, color: colors.default.blue}}>Edit</Text>
+                        </TouchableOpacity>
+                        <PillButton
+                            text="Done"
+                            onPress={() => this.setState({isCardModalVisible: false})}
+                            style={{marginBottom: 10}}
+                        />
+                    </View>
+                    <ScrollView>
+                        <Text style={{fontSize: 22}}>Edit Mode on</Text>
+                        <Text>{this.props.word.word_pronunciation}</Text>
+                        <MeaningInformation
+                            data={this.props.word.Meanings}
+                        />
+                        <TagInformation1
+                            data={this.props.word.Tags} 
+                        />
+                    </ScrollView>
+                </View>
+            </Modal>
+        )
+    }
+
+    renderBrowser = () => {
+        return(
+            <Modal
+                isVisible={this.state.isModalVisible}
+                style={{margin: 0}}
+            >
+                <View style={{flex: 1}}>
+                    <View style={{height: STATUS_BAR_HEIGHT+40, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: colors.default.white, paddingTop: STATUS_BAR_HEIGHT}}>
+                        <TouchableOpacity style={{paddingHorizontal: 15}} onPress={() => this.setState({isModalVisible: false})}>
+                            <Icon name='close' type='evilicon' size='30' onPress={() => this.setState({isModalVisible: false})}/>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{paddingHorizontal: 15}} onPress={() => this.setState({isModalVisible: false})}>
+                            <Icon name='ellipsis1' type='antdesign' size='30' onPress={() => this.setState({isModalVisible: false})}/>
+                        </TouchableOpacity>
+                    </View>
+                    <WebView
+                        source={{uri: "https://www.google.com/search?q=define "+this.props.word.word_text.toLowerCase()}}
+                    />
+                </View>
+            </Modal>
+        )
+    }
+
     render() {
         
         this.cleanString();
 
+        // Render WordCard
         return(
-            // Card
             <View style={[{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 10, backgroundColor: 'white'}, styles.boxWithShadow]}>
                 {
                     // Header
@@ -137,54 +241,11 @@ class WordCard extends React.Component {
                 {
                     // Browser
                 }
-                <Modal
-                    isVisible={this.state.isModalVisible}
-                    style={{margin: 0}}
-                >
-                    <View style={{flex: 1}}>
-                        <View style={{height: STATUS_BAR_HEIGHT+40, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: colors.default.white, paddingTop: STATUS_BAR_HEIGHT}}>
-                            <TouchableOpacity style={{paddingHorizontal: 15}} onPress={() => this.setState({isModalVisible: false})}>
-                                <Icon name='close' type='evilicon' size='30' onPress={() => this.setState({isModalVisible: false})}/>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{paddingHorizontal: 15}} onPress={() => this.setState({isModalVisible: false})}>
-                                <Icon name='ellipsis1' type='antdesign' size='30' onPress={() => this.setState({isModalVisible: false})}/>
-                            </TouchableOpacity>
-                        </View>
-                        <WebView
-                            source={{uri: "https://www.google.com/search?q=define "+this.props.word.word_text.toLowerCase()}}
-                        />
-                    </View>
-                </Modal>
-                <Modal
-                    onBackdropPress={() => this.setState({isCardModalVisible: false})}
-                    isVisible={this.state.isCardModalVisible}
-                >
-                    {
-                        // View/Edit Word modal
-                    }
-                    <View style={{flex: 1, backgroundColor: 'white', marginHorizontali: 20, marginVertical: SCREEN_HEIGHT*0.1, borderRadius: 20, padding: 20}}>
-                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                            <TouchableOpacity onPress={() => console.log(this.props.word)}>
-                                <Text style={{fontSize: 18, color: colors.default.blue}}>Edit</Text>
-                            </TouchableOpacity>
-                            <PillButton
-                                text="Done"
-                                onPress={() => this.setState({isCardModalVisible: false})}
-                                style={{marginBottom: 10}}
-                            />
-                        </View>
-                        <ScrollView>
-                            <Text style={{fontSize: 22}}>{this.props.word.word_text}</Text>
-                            <Text>{this.props.word.word_pronunciation}</Text>
-                            <MeaningInformation
-                                data={this.props.word.Meanings}
-                            />
-                            <TagInformation1
-                                data={this.props.word.Tags} 
-                            />
-                        </ScrollView>
-                    </View>
-                </Modal>
+                {this.renderBrowser()}
+                {
+                    // WordCardModal
+                }
+                {this.state.isModalEditable ? this.renderEditableWordCardModal() : this.renderWordCardModal()}
             </View>
         )
     }
