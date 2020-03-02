@@ -10,7 +10,6 @@ import { colors, STATUS_BAR_HEIGHT, SCREEN_HEIGHT } from '../Styles';
 
 import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
 
-import Tag from './Tag';
 import { TouchableOpacity, TextInput } from 'react-native-gesture-handler';
 import database from '../services/Database';
 
@@ -20,6 +19,10 @@ import TagInformation1 from '../components/Information/TagInformation1';
 
 import PillButton from '../components/PillButton';
 import HorizontalList from './HorizontalList';
+import WordInput from './Forms/WordInput';
+import PronunciationInput from './Forms/PronunciationInput';
+import MeaningForm from './Forms/MeaningForm';
+import TagForm from './Forms/TagForm';
 
 class WordCard extends React.Component {
 
@@ -28,7 +31,14 @@ class WordCard extends React.Component {
 
         this.state = {
             isModalVisible: false,
-            isModalEditable: false,
+            isCardModalVisible: false,
+            isCardModalEditable: false,
+            // NOTE: Once the 'Done' button is clicked the word information
+            // will be updated with the editedWord information in the database
+            editedWord: {
+                word_text: this.props.word.word_text,
+                word_pronunciation: this.props.word.word_pronunciation,
+            }
         }
     }
 
@@ -52,14 +62,10 @@ class WordCard extends React.Component {
         this.setState(prevState => ({isModalVisible: !prevState.isModalVisible}))
     }
 
-    // WordCard is the card itself
-    // It should be editable WordCardModal
-    // and WordCardModal
-
     renderWordCardModal = () => {
         return(
             <Modal
-                onBackdropPress={() => this.setState({isCardModalVisible: false})}
+                onBackdropPress={() => this.setState({isCardModalVisible: false, isCardModalEditable: false})}
                 isVisible={this.state.isCardModalVisible}
             >
                 {
@@ -69,7 +75,7 @@ class WordCard extends React.Component {
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                         <TouchableOpacity onPress={() => {
                             console.log(this.props.word);
-                            this.setState(prevState => ({isModalEditable: !prevState.isModalEditable}));
+                            this.setState(prevState => ({isCardModalEditable: !prevState.isCardModalEditable}));
                         }}>
                             <Text style={{fontSize: 18, color: colors.default.blue}}>Edit</Text>
                         </TouchableOpacity>
@@ -86,7 +92,7 @@ class WordCard extends React.Component {
                             data={this.props.word.Meanings}
                         />
                         <TagInformation1
-                            data={this.props.word.Tags} 
+                            data={this.props.word.Tags}
                         />
                     </ScrollView>
                 </View>
@@ -97,7 +103,7 @@ class WordCard extends React.Component {
     renderEditableWordCardModal = () => {
         return(
             <Modal
-                onBackdropPress={() => this.setState({isCardModalVisible: false})}
+                onBackdropPress={() => this.setState({isCardModalVisible: false, isCardModalEditable: false})}
                 isVisible={this.state.isCardModalVisible}
             >
                 {
@@ -107,24 +113,37 @@ class WordCard extends React.Component {
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                         <TouchableOpacity onPress={() => {
                             console.log(this.props.word);
-                            this.setState(prevState => ({isModalEditable: !prevState.isModalEditable}));
+                            this.setState(prevState => ({isCardModalEditable: !prevState.isCardModalEditable}));
                         }}>
                             <Text style={{fontSize: 18, color: colors.default.blue}}>Edit</Text>
                         </TouchableOpacity>
                         <PillButton
                             text="Done"
-                            onPress={() => this.setState({isCardModalVisible: false})}
+                            onPress={() => {
+                                this.setState({isCardModalVisible: false, isCardModalEditable: false})
+
+                            }}
                             style={{marginBottom: 10}}
                         />
                     </View>
                     <ScrollView>
-                        <Text style={{fontSize: 22}}>Edit Mode on</Text>
-                        <Text>{this.props.word.word_pronunciation}</Text>
-                        <MeaningInformation
-                            data={this.props.word.Meanings}
+                        <WordInput
+                            value={this.state.editedWord.word_text}
+                            onChangeText={(text) => this.setState((prevState) => ({editedWord: { ...prevState.editedWord, word_text: text}}))}
                         />
-                        <TagInformation1
-                            data={this.props.word.Tags} 
+                        <PronunciationInput
+                            value={this.state.editedWord.word_pronunciation}
+                            onChangeText={(text) => this.setState((prevState) => ({editedWord: { ...prevState.editedWord, word_pronunciation: text}}))}
+                        />
+                        <MeaningForm
+                            autofocus
+                            data={this.props.word.Meanings}
+                            onMeaningIndexChange={() => console.log('display')}
+                        />
+                        <TagForm
+                            value="test"
+                            data={this.props.word.Tags}
+                            onMeaningIndexChange={() => console.log("test")}
                         />
                     </ScrollView>
                 </View>
@@ -156,7 +175,7 @@ class WordCard extends React.Component {
     }
 
     render() {
-        
+
         this.cleanString();
 
         // Render WordCard
@@ -245,7 +264,7 @@ class WordCard extends React.Component {
                 {
                     // WordCardModal
                 }
-                {this.state.isModalEditable ? this.renderEditableWordCardModal() : this.renderWordCardModal()}
+                {this.state.isCardModalEditable ? this.renderEditableWordCardModal() : this.renderWordCardModal()}
             </View>
         )
     }
