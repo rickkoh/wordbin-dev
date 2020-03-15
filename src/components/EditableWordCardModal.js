@@ -1,9 +1,13 @@
-import React from 'react-native';
-import { View, StyleSheet, Text } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, ScrollView } from 'react-native';
 
 import { SCREEN_HEIGHT, colors } from '../Styles';
 
+import Modal from 'react-native-modal';
 import PillButton from '../components/PillButton';
+
+import MeaningInformation from '../components/Information/MeaningInformation';
+import TagInformation1 from '../components/Information/TagInformation1';
 
 import WordInput from '../components/Forms/WordInput';
 import PronunciationInput from '../components/Forms/PronunciationInput';
@@ -13,8 +17,11 @@ import TagForm from '../components/Forms/TagForm';
 class EditableWordCardModal extends React.Component {
 
     constructor(props) {
+        super(props);
+
         // Self-governing modal - cohesiveness
         // Find all the props
+        // isEditable
         // isVisible
         // onBackdropPress
 
@@ -24,12 +31,30 @@ class EditableWordCardModal extends React.Component {
         // a. Saves the edited word
         // b. Revert the changes
         this.state = {
+            isEditable: false,
             word: this.props.word,
         }
     }
 
+    onBackdropPress = () => {
+        this.setState({isEditable: false});
+        try {
+            this.props.onBackdropPress();
+        } catch { }
+    }
+
+    onEditButtonPress = () => {
+        this.setState(prevState => ({isEditable: !prevState.isEditable}));
+        try {
+            this.props.onEditButtonPress();
+        } catch { }
+    }
+
     onCancelButtonPress = () => {
-        this.props.onCancelButtonPress();
+        this.setState(prevState => ({isEditable: !prevState.isEditable}));
+        try {
+            this.props.onCancelButtonPress();
+        } catch { }
     }
 
     onDoneButtonPress = () => {
@@ -37,59 +62,89 @@ class EditableWordCardModal extends React.Component {
         // Return new Promise
         // reject: return false
         // success: return word object
-        this.props.onDoneButtonPress();
+        try {
+            this.props.onDoneButtonPress();
+        } catch { }
+    }
+
+    renderModalContent = () => {
+        if (!this.state.isEditable) {
+            return (
+                <View style={styles.container}>
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={() => this.onEditButtonPress()}>
+                            <Text style={{fontSize: 18, color: colors.default.blue}}>Edit</Text>
+                        </TouchableOpacity>
+                        <PillButton
+                            text="Done"
+                            onPress={() => this.setState({isCardModalVisible: false})}
+                            style={{marginBottom: 10}}
+                        />
+                    </View>
+                    <ScrollView>
+                        <Text style={{fontSize: 22}}>{this.props.word.word_text}</Text>
+                        <Text>{this.props.word.word_pronunciation}</Text>
+                        <MeaningInformation
+                            data={this.props.word.Meanings}
+                        />
+                        <TagInformation1
+                            data={this.props.word.Tags}
+                        />
+                    </ScrollView>
+                </View>
+            )
+        } else {
+            return (
+                <View style={styles.container}>
+                    {
+                        // Header
+                    }
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={() => this.onCancelButtonPress()}>
+                            <Text style={styles.cancelButton}>Cancel</Text>
+                        </TouchableOpacity>
+                        <PillButton
+                            text="Done"
+                            onPress={() => this.onDoneButtonPress()}
+                            style={{marginBottom: 10}}
+                        />
+                    </View>
+                    <ScrollView>
+                        <WordInput
+                            value={this.state.word.word_text}
+                            onChangeText={(text) => this.setState((prevState) => ({editedWord: { ...prevState.editedWord, word_text: text}}))}
+                        />
+                        <PronunciationInput
+                            value={this.state.word.word_pronunciation}
+                            onChangeText={(text) => this.setState((prevState) => ({editedWord: { ...prevState.editedWord, word_pronunciation: text}}))}
+                        />
+                        <MeaningForm
+                            autofocus
+                            data={this.state.word.Meanings}
+                            onMeaningIndexChange={() => console.log('display')}
+                        />
+                        <TagForm
+                            value="test"
+                            data={this.state.word.Tags}
+                            onMeaningIndexChange={() => console.log("test")}
+                        />
+                    </ScrollView>
+                </View>
+            )
+        }
     }
 
     render() {
         return(
-            <View>
+            <Modal
+                onBackdropPress={() => this.onBackdropPress()}
+                isVisible={this.props.isVisible}
+            >
                 {
-                    // Modal
+                    // Modal container
                 }
-                <Modal
-                    onBackdropPress={this.props.onBackdropPress}
-                    isVisible={this.props.isVisible}
-                >
-                    {
-                        // Modal container
-                    }
-                    <View style={styles.container}>
-                        {
-                            // Header
-                        }
-                        <View style={styles.header}>
-                            <TouchableOpacity onPress={() => this.onCancelButtonPress}>
-                                <Text style={styles.cancelButton}>Cancel</Text>
-                            </TouchableOpacity>
-                            <PillButton
-                                text="Done"
-                                onPress={() => this.onDoneButtonPress}
-                                style={{marginBottom: 10}}
-                            />
-                        </View>
-                        <ScrollView>
-                            <WordInput
-                                value={this.state.editedWord.word_text}
-                                onChangeText={(text) => this.setState((prevState) => ({editedWord: { ...prevState.editedWord, word_text: text}}))}
-                            />
-                            <PronunciationInput
-                                value={this.state.editedWord.word_pronunciation}
-                                onChangeText={(text) => this.setState((prevState) => ({editedWord: { ...prevState.editedWord, word_pronunciation: text}}))}
-                            />
-                            <MeaningForm
-                                autofocus
-                                data={this.props.word.Meanings}
-                                onMeaningIndexChange={() => console.log('display')}
-                            />
-                            <TagForm
-                                value=""
-                                data={this.props.word.Tags}
-                                onMeaningIndexChange={() => console.log("test")}
-                            />
-                        </ScrollView>
-                    </View>
-                </Modal>
-            </View>
+                {this.renderModalContent()}
+            </Modal>
         )
     }
 }
@@ -97,7 +152,11 @@ class EditableWordCardModal extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white', marginHorizontal: 20, marginVertical: SCREEN_HEIGHT*0.1, borderRadius: 20, padding: 20
+        backgroundColor: 'white',
+        marginHorizontal: 20,
+        marginVertical: SCREEN_HEIGHT*0.1,
+        borderRadius: 20,
+        padding: 20
     },
     header: {
         flexDirection: 'row',
