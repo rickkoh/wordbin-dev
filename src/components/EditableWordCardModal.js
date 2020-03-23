@@ -36,6 +36,13 @@ class EditableWordCardModal extends React.Component {
         }
     }
 
+    componentDidUpdate() {
+        // Reset the isEditable back to default
+        if (!this.props.isVisible && this.state.isEditable) {
+            this.setState({isEditable: false});
+        }
+    }
+
     onBackdropPress = () => {
         this.setState({isEditable: false});
         try {
@@ -77,7 +84,7 @@ class EditableWordCardModal extends React.Component {
                         </TouchableOpacity>
                         <PillButton
                             text="Done"
-                            onPress={() => this.setState({isCardModalVisible: false})}
+                            onPress={() => this.onDoneButtonPress()}
                             style={{marginBottom: 10}}
                         />
                     </View>
