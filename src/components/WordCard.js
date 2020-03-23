@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, DeviceEventEmitter, StyleSheet, Text, FlatList, Image } from 'react-native';
+import { View, DeviceEventEmitter, StyleSheet, Text, Image } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { withNavigation } from 'react-navigation';
 
@@ -15,15 +15,8 @@ import database from '../services/Database';
 
 import MeaningInformation from '../components/Information/MeaningInformation';
 import TagInformation from '../components/Information/TagInformation';
-import TagInformation1 from '../components/Information/TagInformation1';
-
-import PillButton from '../components/PillButton';
-import HorizontalList from './HorizontalList';
-import WordInput from './Forms/WordInput';
-import PronunciationInput from './Forms/PronunciationInput';
-import MeaningForm from './Forms/MeaningForm';
-import TagForm from './Forms/TagForm';
 import EditableWordCardModal from './EditableWordCardModal';
+import WordBrowser from './WordBrowser';
 
 class WordCard extends React.Component {
 
@@ -33,7 +26,6 @@ class WordCard extends React.Component {
         this.state = {
             isModalVisible: false,
             isCardModalVisible: false,
-            isCardModalEditable: false,
             // NOTE: Once the 'Done' button is clicked the word information
             // will be updated with the editedWord information in the database
             editedWord: {
@@ -61,94 +53,6 @@ class WordCard extends React.Component {
 
     toggleModalVisibility = () => {
         this.setState(prevState => ({isModalVisible: !prevState.isModalVisible}))
-    }
-
-    renderWordCardModal = () => {
-        return(
-            <Modal
-                onBackdropPress={() => this.setState({isCardModalVisible: false, isCardModalEditable: true})}
-                isVisible={this.state.isCardModalVisible}
-            >
-                {
-                    // View/Edit Word modal
-                }
-                <View style={{flex: 1, backgroundColor: 'white', marginHorizontali: 20, marginVertical: SCREEN_HEIGHT*0.1, borderRadius: 20, padding: 20}}>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                        <TouchableOpacity onPress={() => {
-                            this.setState(prevState => ({isCardModalEditable: !prevState.isCardModalEditable}));
-                        }}>
-                            <Text style={{fontSize: 18, color: colors.default.blue}}>Edit</Text>
-                        </TouchableOpacity>
-                        <PillButton
-                            text="Done"
-                            onPress={() => this.setState({isCardModalVisible: false})}
-                            style={{marginBottom: 10}}
-                        />
-                    </View>
-                    <ScrollView>
-                        <Text style={{fontSize: 22}}>{this.props.word.word_text}</Text>
-                        <Text>{this.props.word.word_pronunciation}</Text>
-                        <MeaningInformation
-                            data={this.props.word.Meanings}
-                        />
-                        <TagInformation1
-                            data={this.props.word.Tags}
-                        />
-                    </ScrollView>
-                </View>
-            </Modal>
-        )
-    }
-
-    renderEditableWordCardModal = () => {
-        return(
-            <Modal
-                onBackdropPress={() => this.setState({isCardModalVisible: false, isCardModalEditable: false})}
-                isVisible={this.state.isCardModalVisible}
-            >
-                {
-                    // View/Edit Word modal
-                }
-                <View style={{flex: 1, backgroundColor: 'white', marginHorizontali: 20, marginVertical: SCREEN_HEIGHT*0.1, borderRadius: 20, padding: 20}}>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                        <TouchableOpacity onPress={() => {
-                            this.setState(prevState => ({isCardModalEditable: !prevState.isCardModalEditable}));
-                            console.log(this.state.isCardModalEditable);
-                        }}>
-                            <Text style={{fontSize: 18, color: colors.default.blue}}>Edit</Text>
-                        </TouchableOpacity>
-                        <PillButton
-                            text="Done"
-                            onPress={() => {
-                                this.setState({isCardModalVisible: false, isCardModalEditable: false})
-
-                            }}
-                            style={{marginBottom: 10}}
-                        />
-                    </View>
-                    <ScrollView>
-                        <WordInput
-                            value={this.state.editedWord.word_text}
-                            onChangeText={(text) => this.setState((prevState) => ({editedWord: { ...prevState.editedWord, word_text: text}}))}
-                        />
-                        <PronunciationInput
-                            value={this.state.editedWord.word_pronunciation}
-                            onChangeText={(text) => this.setState((prevState) => ({editedWord: { ...prevState.editedWord, word_pronunciation: text}}))}
-                        />
-                        <MeaningForm
-                            autofocus
-                            data={this.props.word.Meanings}
-                            onMeaningIndexChange={() => console.log('display')}
-                        />
-                        <TagForm
-                            value="test"
-                            data={this.props.word.Tags}
-                            onMeaningIndexChange={() => console.log("test")}
-                        />
-                    </ScrollView>
-                </View>
-            </Modal>
-        )
     }
 
     renderBrowser = () => {
@@ -260,7 +164,7 @@ class WordCard extends React.Component {
                 {
                     // Browser
                 }
-                {this.renderBrowser()}
+                <WordBrowser isVisible={this.state.isModalVisible} word={this.props.word.word_text} onCloseButtonPress={() => this.setState({isModalVisible: false})}/>
                 {
                     // WordCardModal
                 }
