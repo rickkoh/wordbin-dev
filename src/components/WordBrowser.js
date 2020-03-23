@@ -1,22 +1,69 @@
 import React from 'react'
-import { FlatList } from 'react-native';
-import { withNavigation } from 'react-navigation';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Icon } from 'react-native-elements';
+import Modal from 'react-native-modal';
+import { WebView } from 'react-native-webview';
 
-import WordCard from './WordCard';
+import { STATUS_BAR_HEIGHT, colors } from '../Styles';
 
 class WordBrowser extends React.Component {
-    // Collects data
-    // And then displays the data in the list form
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isVisible: true
+        }
+    }
+
+    onCloseButtonPress = () => {
+        try {
+            this.props.onCloseButtonPress();
+        } catch { }
+    }
+
     render() {
         return(
-            <FlatList
-                data={this.props.data}
-                contentContainerStyle={{justifyContent: 'center'}}
-                renderItem={({item}) => <WordCard word={item} onCardPress={this.props.onCardPress}/>}
-                keyExtractor={(item, index) => index.toString()}
-            />
+            <Modal
+                isVisible={this.props.isVisible}
+                style={styles.modal}
+            >
+                <View style={styles.container}>
+                    <View style={styles.header}>
+                        <TouchableOpacity style={styles.headerButton} onPress={this.onCloseButtonPress}>
+                            <Icon name='close' type='evilicon' size='30'/>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.headerButton} onPress={this.onCloseButtonPress}>
+                            <Icon name='ellipsis1' type='antdesign' size='30'/>
+                        </TouchableOpacity>
+                    </View>
+                    <WebView
+                        source={{uri: "https://www.google.com/search?q=define "+this.props.word.toLowerCase()}}
+                    />
+                </View>
+            </Modal>
         )
     }
 }
 
-export default withNavigation(WordBrowser);
+const styles = StyleSheet.create({
+    modal: {
+        margin: 0
+    },
+    container: {
+        flex: 1
+    },
+    header: {
+        paddingTop: STATUS_BAR_HEIGHT,
+        height: STATUS_BAR_HEIGHT+40,
+        backgroundColor: colors.default.white,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    headerButton: {
+        paddingHorizontal: 15
+    }
+})
+
+export default WordBrowser;
