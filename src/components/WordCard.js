@@ -170,6 +170,7 @@ class WordCard extends React.Component {
                 }
                 <EditableWordCardModal
                     isVisible={this.state.isCardModalVisible}
+                    onDoneButtonPress={() => this.setState({isCardModalVisible: false})}
                     onBackdropPress={() => this.setState(prevState => ({isCardModalVisible: !prevState.isCardModalVisible}))}
                     word={this.props.word}
                 />

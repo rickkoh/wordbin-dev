@@ -10,6 +10,7 @@ class MeaningForm extends React.Component {
         super(props);
 
         this.state = {
+            meaning: this.props.data,
             meaningIndex: 0,
             isModalVisible: false,
         }
@@ -25,6 +26,12 @@ class MeaningForm extends React.Component {
         // onAntonymsChange
 
         // onMeaningIndexChange
+        console.log(this.state.meaning);
+    }
+
+    componentDidUpdate() {
+        // onMeaningObjectChange = {(meaning) => //hanlde meaningobject}
+        this.props.onMeaningObjectChange ? this.props.onMeaningObjectChange(this.state.meaning) : null;
     }
 
     scrollToIndex = (index, animated) => {

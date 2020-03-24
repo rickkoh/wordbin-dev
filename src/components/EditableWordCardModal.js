@@ -76,6 +76,7 @@ class EditableWordCardModal extends React.Component {
 
     renderModalContent = () => {
         if (!this.state.isEditable) {
+            // Render normal WordCardModal
             return (
                 <View style={styles.container}>
                     <View style={styles.header}>
@@ -101,6 +102,7 @@ class EditableWordCardModal extends React.Component {
                 </View>
             )
         } else {
+            // Render editable WordCardModal
             return (
                 <View style={styles.container}>
                     {
@@ -119,11 +121,11 @@ class EditableWordCardModal extends React.Component {
                     <ScrollView>
                         <WordInput
                             value={this.state.word.word_text}
-                            onChangeText={(text) => this.setState((prevState) => ({editedWord: { ...prevState.editedWord, word_text: text}}))}
+                            onChangeText={(text) => this.setState((prevState) => ({word: { ...prevState.word, word_text: text}}))}
                         />
                         <PronunciationInput
                             value={this.state.word.word_pronunciation}
-                            onChangeText={(text) => this.setState((prevState) => ({editedWord: { ...prevState.editedWord, word_pronunciation: text}}))}
+                            onChangeText={(text) => this.setState((prevState) => ({word: { ...prevState.word, word_pronunciation: text}}))}
                         />
                         <MeaningForm
                             autofocus

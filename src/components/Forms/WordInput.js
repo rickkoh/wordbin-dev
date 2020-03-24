@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     textInput: {
         height: 40,
         fontSize: 26,
-        paddingHorizontal: 20,
+        // paddingHorizontal: 20,
     }
 })
 
