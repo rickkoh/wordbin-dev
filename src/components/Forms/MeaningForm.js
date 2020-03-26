@@ -29,9 +29,11 @@ class MeaningForm extends React.Component {
         console.log(this.state.meaning);
     }
 
-    componentDidUpdate() {
-        // onMeaningObjectChange = {(meaning) => //hanlde meaningobject}
-        this.props.onMeaningObjectChange ? this.props.onMeaningObjectChange(this.state.meaning) : null;
+    componentDidUpdate(prevProps, prevState) {
+        // onMeaningDataChanged = {(meaning) => //handle meaningData}
+        if (this.state != prevState) {
+            this.props.onMeaningDataChange ? this.props.onMeaningDataChange(this.state.meaning) : null;
+        }
     }
 
     scrollToIndex = (index, animated) => {
@@ -76,6 +78,32 @@ class MeaningForm extends React.Component {
         this.classificationHasFocus = false;
     }
 
+    onMeaningTextChange = (text, index) => {
+        meaning = this.state.meaning;
+        meaning[index].meaning_text = text;
+
+        if (index == meaning.length-1) {
+            if (meaning[index].meaning_text != "" && meaning[index].meaning_text != undefined) {
+                meaning = meaning.concat({meaning_id: undefined, meaning_text: undefined, meaning_classification: undefined, meaning_datetimecreated: undefined});
+            }
+        } else {
+            // Fix: This method implemented causes confusion in the user as the user keeps backspacing
+            if (meaning[index].meaning_text == "" || meaning[index].meaning_text == undefined) {
+                meaning.splice(index, 1);
+            }
+        }
+
+        this.setState({ meaning: meaning });
+        this.props.onMeaningTextChange ? this.props.onMeaningTextChange(text, index) : null;
+    }
+
+    onClassificationTextChange = (text, index) => {
+        meaning = this.state.meaning;
+        meaning[index].meaning_classification = text;
+        this.setState({ meaning: meaning });
+        this.props.onClassificationTextChange ? this.props.onClassificationTextChange(text, index) : null;
+    }
+
     _renderMeaningColumn = ({item, index}) => {
         return(
             <View style={styles.container}>
@@ -88,7 +116,7 @@ class MeaningForm extends React.Component {
                     value={item.meaning_text}
                     onFocus={this.onMeaningTextFocus}
                     onBlur={this.onMeaningTextBlur}
-                    onChangeText={(text) => this.props.onMeaningTextChange(text, index)}
+                    onChangeText={(text) => this.onMeaningTextChange(text, index)}
                 />
                 <View style={styles.rowContainer}>
                     <TextInput
@@ -99,7 +127,7 @@ class MeaningForm extends React.Component {
                         value={item.meaning_classification}
                         onFocus={this.onClassificationTextFocus}
                         onBlur={this.onClassificationTextBlur}
-                        onChangeText={(text) => this.props.onClassificationTextChange(text, index)}
+                        onChangeText={(text) => this.onClassificationTextChange(text, index)}
                     />
                     <TouchableOpacity onPress={() => this.props.toggleVisibility()}>
                         <Text style={{color: colors.default.blue}}>More options</Text>
@@ -122,7 +150,7 @@ class MeaningForm extends React.Component {
                 pagingEnabled
                 style={styles.container}
                 showsHorizontalScrollIndicator={false}
-                data={this.props.data}
+                data={this.state.meaning}
                 renderItem={this._renderMeaningColumn}
                 onViewableItemsChanged={this.onViewableItemsChanged}
                 keyExtractor={(item, index) => index.toString()}
