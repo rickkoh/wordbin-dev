@@ -74,7 +74,7 @@ class TagForm extends React.Component {
 const styles = StyleSheet.create({
     textInput: {
         height: 40,
-        paddingHorizontal: 20,
+        // paddingHorizontal: 20,
         fontSize: 16,
     }
 })

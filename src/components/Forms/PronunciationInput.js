@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     textInput: {
         height: 40,
         fontSize: 16,
-        paddingHorizontal: 20,
+        // paddingHorizontal: 20,
     }
 });
 

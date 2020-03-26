@@ -169,13 +169,13 @@ const styles = StyleSheet.create({
     rowContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
+        // paddingHorizontal: 20,
         marginVertical: 10,
     },
     meaningTextInput: {
         flex: 1,
         width: SCREEN_WIDTH,
-        paddingHorizontal: 20,
+        // paddingHorizontal: 20,
         textAlignVertical: 'top',
         fontSize: 16,
     },
