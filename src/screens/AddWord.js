@@ -389,9 +389,8 @@ class AddWordScreen extends React.Component {
                     autofocus
                     ref={(ref) => { this.meaningForm = ref }}
                     data={this.state.meaning}
+                    onMeaningDataChange={(meaning) => this.setState({meaning: meaning})}
                     onMeaningIndexChange={(index) => this.meaningCurrentIndexChanged(index)}
-                    onMeaningTextChange={this.handleMeaningChange}
-                    onClassificationTextChange={this.handleClassificationChange}
                     onMeaningTextFocus={() => this.setState({keyboardBarType: 'meaning'})}
                     onClassificationTextFocus={() => this.setState({keyboardBarType: 'classification'})}
                     toggleVisibility={this.toggleMeaningModalVisibility}
