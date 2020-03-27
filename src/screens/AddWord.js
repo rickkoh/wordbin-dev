@@ -83,36 +83,10 @@ class AddWordScreen extends React.Component {
         DeviceEventEmitter.emit("database_changed");
     }
 
-    // Handle meaning change
-    handleMeaningChange = (text, index) => {
-        meaning = this.state.meaning;
-        meaning[index].meaning_text = text;
-
-        if (index == meaning.length-1) {
-            if (meaning[index].meaning_text != "" && meaning[index].meaning_text != undefined) {
-                meaning = meaning.concat({meaning_id: undefined, meaning_text: undefined, meaning_classification: undefined, meaning_datetimecreated: undefined});
-            }
-        } else {
-            // Fix: This method implemented causes confusion in the user as the user keeps backspacing
-            if (meaning[index].meaning_text == "" || meaning[index].meaning_text == undefined) {
-                meaning.splice(index, 1);
-            }
-        }
-
-        this.setState({ meaning: meaning });
-    }
-
     // Handle meaning sentence example change
     handleMeaningSentenceExampleChange = (text , index) => {
         meaning = this.state.meaning;
         meaning[index].sentenceexample
-    }
-
-    // Handle classification change
-    handleClassificationChange = (text, index) => {
-        meaning = this.state.meaning;
-        meaning[index].meaning_classification = text;
-        this.setState({ meaning: meaning });
     }
 
     // Remove meaning
