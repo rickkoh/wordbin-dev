@@ -131,6 +131,12 @@ class EditableWordCardModal extends React.Component {
                             autofocus
                             data={this.state.word.Meanings}
                             onMeaningIndexChange={() => console.log('display')}
+                            onMeaningDataChange={(meaning) =>  {
+                                word = this.state.word;
+                                word.Meanings = meaning;
+                                this.setState({word: word})
+                                console.log(this.state.word);
+                            }}
                         />
                         <TagForm
                             value="test"
