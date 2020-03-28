@@ -492,6 +492,24 @@ class Database {
             });
         })
     }
+
+    // Update the word
+    updateWord(word_id, word_text) {
+        return new Promise((resolve, reject) => {
+            noRowsAffected = undefined;
+            db.transaction(tx => {
+                tx.executeSql(
+                    Word.Query.UPDATE_WORD_QUERY,
+                    [word_text, word_id],
+                    (_, { rowsAffected }) => noRowsAffected = rowsAffected
+                );
+            }, error => {
+                reject(error);
+            }, success => {
+                resolve(noRowsAffected);
+            });
+        })
+    }
     
     // Print the database location
     printDatabaseLocation() {
