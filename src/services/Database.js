@@ -493,7 +493,7 @@ class Database {
         })
     }
 
-    // Update the word
+    // Update word text
     updateWord(word_id, word_text) {
         return new Promise((resolve, reject) => {
             noRowsAffected = undefined;
@@ -501,6 +501,42 @@ class Database {
                 tx.executeSql(
                     Word.Query.UPDATE_WORD_QUERY,
                     [word_text, word_id],
+                    (_, { rowsAffected }) => noRowsAffected = rowsAffected
+                );
+            }, error => {
+                reject(error);
+            }, success => {
+                resolve(noRowsAffected);
+            });
+        })
+    }
+
+    // Update meaning text
+    updateMeaningText(meaning_id, meaning_text) {
+        return new Promise((resolve, reject) => {
+            noRowsAffected = undefined;
+            db.transaction(tx => {
+                tx.executeSql(
+                    Meaning.Query.UPDATE_MEANING_TEXT_QUERY,
+                    [meaning_text, meaning_id],
+                    (_, { rowsAffected }) => noRowsAffected = rowsAffected
+                );
+            }, error => {
+                reject(error);
+            }, success => {
+                resolve(noRowsAffected);
+            });
+        })
+    }
+
+    // Update meaning classification
+    updateMeaningClassification(meaning_id, meaning_classification) {
+        return new Promise((resolve, reject) => {
+            noRowsAffected = undefined;
+            db.transaction(tx => {
+                tx.executeSql(
+                    Meaning.Query.UPDATE_MEANING_CLASSIFICATION_QUERY,
+                    [meaning_classification, meaning_id],
                     (_, { rowsAffected }) => noRowsAffected = rowsAffected
                 );
             }, error => {
