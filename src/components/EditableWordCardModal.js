@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { DeviceEventEmitter, View, StyleSheet, Text, TouchableOpacity, ScrollView } from 'react-native';
 
 import { SCREEN_HEIGHT, colors } from '../Styles';
 
@@ -13,6 +13,7 @@ import WordInput from '../components/Forms/WordInput';
 import PronunciationInput from '../components/Forms/PronunciationInput';
 import MeaningForm from '../components/Forms/MeaningForm';
 import TagForm from '../components/Forms/TagForm';
+import database from '../services/Database';
 
 class EditableWordCardModal extends React.Component {
 
@@ -69,6 +70,11 @@ class EditableWordCardModal extends React.Component {
         // Return new Promise
         // reject: return false
         // success: return word object
+        database.updateWord(this.state.word.word_id, this.state.word.word_text).then(rowsAffected => {
+            if (rowsAffected !== undefined && rowsAffected > 0) {
+                DeviceEventEmitter.emit("database_changed");
+            }
+        })
         try {
             this.props.onDoneButtonPress();
         } catch { }
