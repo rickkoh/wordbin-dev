@@ -4,9 +4,9 @@ import { getStatusBarHeight } from 'react-native-status-bar-height';
 const dim = Dimensions.get('window');
 export const STATUS_BAR_HEIGHT = Platform.OS === 'ios'
                         ? isIphoneXSize() || isIphoneXrSize()
-                        ? 44
-                        : 20
-                        : 24
+                        ? 44 // Is IphoneX or IphoneXr
+                        : 20 // Not IphoneX nor IphoneXr
+                        : 24 // Not ios
 
 export const SCREEN_HEIGHT = dim.height;
 export const SCREEN_WIDTH = dim.width;

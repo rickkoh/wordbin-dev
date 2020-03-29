@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, StyleSheet, View, Text, ScrollView, Dimensions } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
 import { STATUS_BAR_HEIGHT, colors } from '../Styles';
 
 class FlatListWithCollapsibleHeader extends React.Component {
