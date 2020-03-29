@@ -70,11 +70,36 @@ class EditableWordCardModal extends React.Component {
         // Return new Promise
         // reject: return false
         // success: return word object
+
+        async function asyncForEach(array, callback) {
+            for (let index = 0; index < array.length; index++) {
+                await callback(array[index], index, array);
+            }
+        }
+
+        databaseChanged = false;
+
+        // Update word
         database.updateWord(this.state.word.word_id, this.state.word.word_text).then(rowsAffected => {
             if (rowsAffected !== undefined && rowsAffected > 0) {
-                DeviceEventEmitter.emit("database_changed");
+                databaseChanged = true;
             }
-        })
+        });
+
+        // Update meaning
+        asyncForEach(this.state.word.Meanings, async (meaning, index) => {
+            // Check if meaning object changed
+            if (this.state.word.Meanings[index] != meaning) {
+                await database.updateMeaningText(meaning.meaning_id, meaning.meaning_text).then(rowsAffected => {
+                    if (rowsAffected !== undefined && rowsAffected > 0) {
+                        databaseChanged = true;
+                    }
+                })
+            }
+        });
+
+        if (databaseChanged) DeviceEventEmitter.emit("database_changed");
+
         try {
             this.props.onDoneButtonPress();
         } catch { }
@@ -145,7 +170,7 @@ class EditableWordCardModal extends React.Component {
                             }}
                         />
                         <TagForm
-                            value="test"
+                            value=""
                             data={this.state.word.Tags}
                             onMeaningIndexChange={() => console.log("test")}
                         />
