@@ -26,7 +26,6 @@ class MeaningForm extends React.Component {
         // onAntonymsChange
 
         // onMeaningIndexChange
-        console.log(this.state.meaning);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -36,12 +35,18 @@ class MeaningForm extends React.Component {
         }
     }
 
+    // Scroll to index function
     scrollToIndex = (index, animated) => {
         // Ensure index is within range
         if (index > -1 && index < this.props.data.length) {
             // Scroll to index
             this.flatList.scrollToIndex({animated: animated, index: index});
         } 
+    }
+
+    // Update data function
+    updateData = () => {
+        this.setState({meaning: this.props.data});
     }
 
     onViewableItemsChanged = ({ viewableItems }) => {
@@ -104,6 +109,24 @@ class MeaningForm extends React.Component {
         this.props.onClassificationTextChange ? this.props.onClassificationTextChange(text, index) : null;
     }
 
+    render() {
+        return(
+            <FlatList
+                ref={(ref) => { this.flatList = ref }}
+                keyboardShouldPersistTaps="always"
+                horizontal
+                pagingEnabled
+                style={styles.container}
+                showsHorizontalScrollIndicator={false}
+                data={this.state.meaning}
+                renderItem={this._renderMeaningColumn}
+                onViewableItemsChanged={this.onViewableItemsChanged}
+                keyExtractor={(item, index) => index.toString()}
+                listKey={(item, index) => index.toString()}
+            />
+        )
+    }
+
     _renderMeaningColumn = ({item, index}) => {
         return(
             <View style={styles.container}>
@@ -138,24 +161,6 @@ class MeaningForm extends React.Component {
 
                 </Modal>
             </View>
-        )
-    }
-
-    render() {
-        return(
-            <FlatList
-                ref={(ref) => { this.flatList = ref }}
-                keyboardShouldPersistTaps="always"
-                horizontal
-                pagingEnabled
-                style={styles.container}
-                showsHorizontalScrollIndicator={false}
-                data={this.state.meaning}
-                renderItem={this._renderMeaningColumn}
-                onViewableItemsChanged={this.onViewableItemsChanged}
-                keyExtractor={(item, index) => index.toString()}
-                listKey={(item, index) => index.toString()}
-            />
         )
     }
 }

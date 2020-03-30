@@ -147,6 +147,7 @@ class AddWordScreen extends React.Component {
     }
 
     apiButtonPressed = () => {
+        // Fetch data when api button is pressed
         NetInfo.getConnectionInfo().then((connectionInfo) => {
             if (connectionInfo.type != 'none') {
                 // Replace spaces with dashes
@@ -282,6 +283,8 @@ class AddWordScreen extends React.Component {
             word: Word,
             meaning: Meaning,
             isAPIModalVisible: false
+        }, () => {
+            this.meaningForm.updateData();
         });
     }
 
