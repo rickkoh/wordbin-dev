@@ -1,5 +1,5 @@
 import React from 'react';
-import { DeviceEventEmitter, ScrollView, FlatList, NetInfo, KeyboardAvoidingView, Text, View, TouchableOpacity } from 'react-native';
+import { DeviceEventEmitter, ScrollView, FlatList, NetInfo, KeyboardAvoidingView, Text, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 import Modal from 'react-native-modal';
 
@@ -330,7 +330,7 @@ class AddWordScreen extends React.Component {
 
     render() {
         return (
-            <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" enabled>
+            <KeyboardAvoidingView style={styles.keyboardContainer} behavior="padding" enabled>
                 <Header
                     headerLeft={
                         <TouchableOpacity
@@ -351,35 +351,37 @@ class AddWordScreen extends React.Component {
                         />
                     }
                 />
-                <WordInput
-                    ref={(ref) => { this.wordInput = ref }}
-                    value={this.state.word.word_text}
-                    onChangeText={(text) => this.setState((prevState) => ({word: { ...prevState.word, word_text: text}}))}
-                    onFocus={() => this.setState({keyboardBarType: 'word'})}
-                />
-                <PronunciationInput
-                    value={this.state.word.word_pronunciation}
-                    onChangeText={(text) => this.setState((prevState) => ({word: { ...prevState.word, word_pronunciation: text}}))}
-                    onFocus={() => this.setState({keyboardBarType: 'pronunciation'})}
-                />
-                <MeaningForm
-                    autofocus
-                    ref={(ref) => { this.meaningForm = ref }}
-                    data={this.state.meaning}
-                    onMeaningDataChange={(meaning) => this.setState({meaning: meaning})}
-                    onMeaningIndexChange={(index) => this.meaningCurrentIndexChanged(index)}
-                    onMeaningTextFocus={() => this.setState({keyboardBarType: 'meaning'})}
-                    onClassificationTextFocus={() => this.setState({keyboardBarType: 'classification'})}
-                    toggleVisibility={this.toggleMeaningModalVisibility}
-                />
-                <TagForm
-                    value={this.state.tags[this.state.tags.length-1].tag_title}
-                    data={this.state.tags}
-                    onChangeText={this.handleTagChange}
-                    onPress={this.removeTag}
-                    onBlur={this.addTag}
-                    onFocus={() => this.setState({keyboardBarType: 'tag'})}
-                />
+                <View style={styles.formContainer}>
+                    <WordInput
+                        ref={(ref) => { this.wordInput = ref }}
+                        value={this.state.word.word_text}
+                        onChangeText={(text) => this.setState((prevState) => ({word: { ...prevState.word, word_text: text}}))}
+                        onFocus={() => this.setState({keyboardBarType: 'word'})}
+                    />
+                    <PronunciationInput
+                        value={this.state.word.word_pronunciation}
+                        onChangeText={(text) => this.setState((prevState) => ({word: { ...prevState.word, word_pronunciation: text}}))}
+                        onFocus={() => this.setState({keyboardBarType: 'pronunciation'})}
+                    />
+                    <MeaningForm
+                        autofocus
+                        ref={(ref) => { this.meaningForm = ref }}
+                        data={this.state.meaning}
+                        onMeaningDataChange={(meaning) => this.setState({meaning: meaning})}
+                        onMeaningIndexChange={(index) => this.meaningCurrentIndexChanged(index)}
+                        onMeaningTextFocus={() => this.setState({keyboardBarType: 'meaning'})}
+                        onClassificationTextFocus={() => this.setState({keyboardBarType: 'classification'})}
+                        toggleVisibility={this.toggleMeaningModalVisibility}
+                    />
+                    <TagForm
+                        value={this.state.tags[this.state.tags.length-1].tag_title}
+                        data={this.state.tags}
+                        onChangeText={this.handleTagChange}
+                        onPress={this.removeTag}
+                        onBlur={this.addTag}
+                        onFocus={() => this.setState({keyboardBarType: 'tag'})}
+                    />
+                </View>
                 <KeyboardBar
                     renderContent={this.renderKeyboardBar()}
                     enabled={this.state.isValidated}
@@ -449,5 +451,15 @@ KeyboardBar = (props) => {
             </View>
         )
 }
+
+const styles = StyleSheet.create({
+    keyboardContainer: {
+        flex: 1,
+    },
+    formContainer: {
+        flex: 1,
+        paddingHorizontal: 20,
+    }
+})
 
 export default AddWordScreen;
