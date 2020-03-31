@@ -46,9 +46,9 @@ class AddWordScreen extends React.Component {
                 }
             ],
             tags: [
-                {
-                    tag_title: undefined,
-                }
+                // {
+                    // tag_title: undefined,
+                // }
             ],
             apiWord: {
                 word_text: "",
@@ -96,38 +96,10 @@ class AddWordScreen extends React.Component {
         this.setState({ meaning: meaning });
     }
 
-    // Handle tag change
-    handleTagChange = (text) => {
-        if (text.length > 1 && text[text.length-1] == " "){
-            this.addTag();
-        } else {
-            tags = this.state.tags;
-            tags[tags.length-1].tag_title = text;
-            this.setState({ tags: tags });
-        }
-    }
-
     // Handle origin change
     handleOriginChange = (text) => {
         this.state.word.word_origin = text;
         this.setState({ word: this.state.word });
-    }
-
-    // Add tag
-    addTag = () => {
-        tags = this.state.tags;
-        text = tags[tags.length-1].tag_title;
-        if (text != undefined && text.length>0) {
-            tags = tags.concat({tag_title: undefined});
-            this.setState({ tags: tags });
-        }
-    }
-
-    // Remove tag
-    removeTag = (index) => {
-        tags = this.state.tags;
-        tags.splice(index, 1);
-        this.setState({ tags: tags });
     }
 
     // Toggle 
@@ -374,11 +346,8 @@ class AddWordScreen extends React.Component {
                         toggleVisibility={this.toggleMeaningModalVisibility}
                     />
                     <TagForm
-                        value={this.state.tags[this.state.tags.length-1].tag_title}
                         data={this.state.tags}
-                        onChangeText={this.handleTagChange}
-                        onPress={this.removeTag}
-                        onBlur={this.addTag}
+                        onTagDataChange={(tags) => this.setState({tags: tags})}
                         onFocus={() => this.setState({keyboardBarType: 'tag'})}
                     />
                 </View>
