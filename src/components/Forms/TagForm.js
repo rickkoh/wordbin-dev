@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     },
     tagItemContainer: {
         marginBottom: 10,
-        flexDirection: 'ro0w',
+        flexDirection: 'row',
         justifyContent: 'center',
     },
     tagItem: {
