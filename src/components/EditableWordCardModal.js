@@ -21,36 +21,44 @@ class EditableWordCardModal extends React.Component {
         super(props);
 
         // Self-governing modal - cohesiveness
-        // Find all the props
+        // Props
         // isEditable
         // isVisible
         // onBackdropPress
 
-        // Get the word
-        // Copy the word
+        // Get word
+        // Copy word
         // Edit copied word
         // a. Saves the edited word
         // b. Revert the changes
+
         this.state = {
             isEditable: false,
             word: this.props.word,
         }
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps, prevState) {
         // Reset the isEditable back to default
         if (!this.props.isVisible && this.state.isEditable) {
             this.setState({isEditable: false});
         }
+
+        if (this.state != prevState) {
+            this.props.onWordDataChange ? this.props.onWordDataChange(this.state.word) : null;
+        }
     }
 
+    // Handles onBackdropPress
     onBackdropPress = () => {
+        console.log(this.state.word);
         this.setState({isEditable: false});
         try {
             this.props.onBackdropPress();
         } catch { }
     }
 
+    // Handles onEditButtonPress
     onEditButtonPress = () => {
         this.setState(prevState => ({isEditable: !prevState.isEditable}));
         try {
@@ -58,6 +66,7 @@ class EditableWordCardModal extends React.Component {
         } catch { }
     }
 
+    // Handles onCancelButtonPress
     onCancelButtonPress = () => {
         this.setState(prevState => ({isEditable: !prevState.isEditable}));
         try {
@@ -65,6 +74,7 @@ class EditableWordCardModal extends React.Component {
         } catch { }
     }
 
+    // Hanldes onDoneButtonPress
     onDoneButtonPress = () => {
         // Perform SQL update query
         // Return new Promise
@@ -105,6 +115,7 @@ class EditableWordCardModal extends React.Component {
         } catch { }
     }
 
+    // Render modal content based on editable
     renderModalContent = () => {
         if (!this.state.isEditable) {
             // Render normal WordCardModal
@@ -170,9 +181,11 @@ class EditableWordCardModal extends React.Component {
                             }}
                         />
                         <TagForm
-                            value=""
                             data={this.state.word.Tags}
-                            onMeaningIndexChange={() => console.log("test")}
+                            onTagDataChange={(tag) => {
+                                console.log(tag);
+                                this.setState((prevState) => ({word: { ...prevState.word, Tags: tag}}))}
+                            }
                         />
                     </ScrollView>
                 </View>

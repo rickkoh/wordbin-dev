@@ -18,6 +18,8 @@ import database from '../services/Database';
 
 import FlatListWithCollapsibleHeader from '../components/FlatListWithCollapsibleHeader';
 
+// NEEDS REVAMP
+
 export default class HomeScreen extends React.Component {
 
     constructor(props) {
@@ -157,9 +159,11 @@ export default class HomeScreen extends React.Component {
             <View style={{flex: 1, backgroundColor: colors.default.backgroundColor}}>
                 {
                     this.state.Words == undefined ? (
+                        // Render for the condition: loading
                         <LoadingPage/>
                     ) : 
                     this.state.Words.length <= 0 ? (
+                        // Render for the condition: no words
                         <FlatListWithCollapsibleHeader
                             header={this.header()}
                             navHeight={44}
@@ -169,6 +173,7 @@ export default class HomeScreen extends React.Component {
                         >
                         </FlatListWithCollapsibleHeader>
                     ) : (
+                        // Render for the condition: have words
                         <FlatListWithCollapsibleHeader
                             header={this.header()}
                             navHeight={44}

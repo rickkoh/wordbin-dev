@@ -18,6 +18,7 @@ import TagInformation from '../components/Information/TagInformation';
 import EditableWordCardModal from './EditableWordCardModal';
 import WordBrowser from './WordBrowser';
 
+// Takes in a
 class WordCard extends React.Component {
 
     constructor(props) {
@@ -55,29 +56,6 @@ class WordCard extends React.Component {
         this.setState(prevState => ({isModalVisible: !prevState.isModalVisible}))
     }
 
-    renderBrowser = () => {
-        return(
-            <Modal
-                isVisible={this.state.isModalVisible}
-                style={{margin: 0}}
-            >
-                <View style={{flex: 1}}>
-                    <View style={{height: STATUS_BAR_HEIGHT+40, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: colors.default.white, paddingTop: STATUS_BAR_HEIGHT}}>
-                        <TouchableOpacity style={{paddingHorizontal: 15}} onPress={() => this.setState({isModalVisible: false})}>
-                            <Icon name='close' type='evilicon' size='30' onPress={() => this.setState({isModalVisible: false})}/>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={{paddingHorizontal: 15}} onPress={() => this.setState({isModalVisible: false})}>
-                            <Icon name='ellipsis1' type='antdesign' size='30' onPress={() => this.setState({isModalVisible: false})}/>
-                        </TouchableOpacity>
-                    </View>
-                    <WebView
-                        source={{uri: "https://www.google.com/search?q=define "+this.props.word.word_text.toLowerCase()}}
-                    />
-                </View>
-            </Modal>
-        )
-    }
-
     render() {
 
         this.cleanString();
@@ -87,49 +65,8 @@ class WordCard extends React.Component {
             <View style={[{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 10, backgroundColor: 'white'}, styles.boxWithShadow]}>
                 {
                     // Header
+                    this._renderHeader()
                 }
-                <View style={{alignItems: 'flex-end'}}>
-                    {
-                        // Menu
-                    }
-                    <TouchableOpacity style={{paddingLeft: 10, paddingRight: 5}} onPress={() => {
-                        this._menu.show();
-                    }}>
-                        <Text style={{fontWeight: 'bold'}}>...</Text>
-                        <Menu ref={(ref) => this._menu = ref} style={{backgroundColor: 'black'}}>
-                            <MenuItem onPress={() => {
-                                console.log('Edit ' + this.props.word.word_text);
-                                this.hideMenu();
-                            }}>
-                                <Text style={{color: 'white'}}>Hide</Text>
-                            </MenuItem>
-                            <MenuItem onPress={() => {
-                                console.log('Edit ' + this.props.word.word_text);
-                                this.hideMenu();
-                            }}>
-                                <Text style={{color: 'white'}}>Edit</Text>
-                            </MenuItem>
-                            <MenuItem onPress={() => {
-                                console.log('Move item up');
-                                this.hideMenu();
-                            }}>
-                                <Text style={{color: 'white'}}>Shift Up</Text>
-                            </MenuItem>
-                            <MenuItem onPress={() => {
-                                console.log('Move item down');
-                                this.hideMenu();
-                            }}>
-                                <Text style={{color: 'white'}}>Shift Down</Text>
-                            </MenuItem>
-                            <MenuItem onPress={() => {
-                                database.deleteWord(this.props.word.word_id).then(() => DeviceEventEmitter.emit('database_changed'));
-                                this.hideMenu();
-                            }}>
-                                <Text style={{color: 'white'}}>Delete</Text>
-                            </MenuItem>
-                        </Menu>
-                    </TouchableOpacity>
-                </View>
                 {
                     // Title
                 }
@@ -173,9 +110,64 @@ class WordCard extends React.Component {
                     onDoneButtonPress={() => this.setState({isCardModalVisible: false})}
                     onBackdropPress={() => this.setState(prevState => ({isCardModalVisible: !prevState.isCardModalVisible}))}
                     word={this.props.word}
+                    onWordDataChange={(word) => console.log(word)}
                 />
             </View>
         )
+    }
+
+    _renderHeader = () => {
+        return (
+            <View style={{alignItems: 'flex-end'}}>
+                {
+                    // Menu
+                }
+                <TouchableOpacity style={{paddingLeft: 10, paddingRight: 5}} onPress={() => {
+                    this._menu.show();
+                }}>
+                    <Text style={{fontWeight: 'bold'}}>...</Text>
+                    {this._renderMenu()}
+                </TouchableOpacity>
+            </View>
+        )
+    }
+
+    _renderMenu = () => {
+        return(
+            <Menu ref={(ref) => this._menu = ref} style={{backgroundColor: 'black'}}>
+                <MenuItem onPress={() => {
+                    console.log('Edit ' + this.props.word.word_text);
+                    this.hideMenu();
+                }}>
+                    <Text style={{color: 'white'}}>Hide</Text>
+                </MenuItem>
+                <MenuItem onPress={() => {
+                    console.log('Edit ' + this.props.word.word_text);
+                    this.hideMenu();
+                }}>
+                    <Text style={{color: 'white'}}>Edit</Text>
+                </MenuItem>
+                <MenuItem onPress={() => {
+                    console.log('Move item up');
+                    this.hideMenu();
+                }}>
+                    <Text style={{color: 'white'}}>Shift Up</Text>
+                </MenuItem>
+                <MenuItem onPress={() => {
+                    console.log('Move item down');
+                    this.hideMenu();
+                }}>
+                    <Text style={{color: 'white'}}>Shift Down</Text>
+                </MenuItem>
+                <MenuItem onPress={() => {
+                    database.deleteWord(this.props.word.word_id).then(() => DeviceEventEmitter.emit('database_changed'));
+                    this.hideMenu();
+                }}>
+                    <Text style={{color: 'white'}}>Delete</Text>
+                </MenuItem>
+            </Menu>
+        )
+
     }
 }
 
