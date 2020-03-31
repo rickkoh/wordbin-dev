@@ -5,8 +5,6 @@ import ClearButton from '../ClearButton';
 
 import { SCREEN_WIDTH } from '../../Measurements';
 
-// TODO: Needs revamp
-
 class TagForm extends React.Component {
 
     constructor(props) {
@@ -17,12 +15,6 @@ class TagForm extends React.Component {
             tag: this.props.data,
         }
 
-        // Props
-        // data
-        // onChangeText
-        // onPress
-        // onBlur
-        // onFocus
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -32,14 +24,9 @@ class TagForm extends React.Component {
         }
     }
 
-    // Scroll to index function
-    scrollToIndex = (index, animated) => {
-        this.flatList.scrollToIndex({animated: animated, index: index});
-    }
-
     // Update data function
     updateData = () => {
-        this.setState({ tag: this.props.data });
+        this.setState({tag: this.props.data});
     }
 
     // Add tag
@@ -51,6 +38,8 @@ class TagForm extends React.Component {
                 }, () => {
                     resolve();
                 });
+            } else {
+                reject();
             }
         })
     }
@@ -60,6 +49,11 @@ class TagForm extends React.Component {
         tag = this.state.tag;
         tag.splice(index, 1);
         this.setState({tag: tag});
+    }
+
+    // Scroll to index function
+    scrollToIndex = (index, animated) => {
+        this.flatList.scrollToIndex({animated: animated, index: index});
     }
 
     // Handle tag input text change
@@ -78,15 +72,22 @@ class TagForm extends React.Component {
     onKeyPress = (e) => {
         // Add tag if " " is detected
         if (e.nativeEvent.key == ' ') {
-            if (this.state.value!= undefined && this.state.value.length >= 1) this.addTag(this.state.value);
+            // Ensure that value has at least a character
+            if (this.state.value != undefined && this.state.value.length >= 1) this.addTag(this.state.value);
             this.setState({value: ""})
         }
+
+        this.props.onKeyPress ? this.props.onKeyPress(e) : null;
     }
 
     // Handle onChange event
     onChange = (e) => {
+        // Set value to "" if a space " " is detected
         if (e.nativeEvent.text.includes(" ")) this.setState({value: ""});
+        // Else set value to user input
         else this.setState({value: e.nativeEvent.text});
+
+        this.props.onChange ? this.props.onChange(e) : null;
     }
 
     // onBlur function
@@ -137,9 +138,9 @@ class TagForm extends React.Component {
 
     _renderTagItem = ({item, index}) => {
         return(
-            <View style={{marginBottom: 10, flexDirection: 'row', justifyContent: 'center'}}>
-                <View style={{flexDirection: 'row',  borderRadius: 5, backgroundColor: '#f4f7f8'}}>
-                    <Text style={{padding: 5, paddingRight: 0}}>{item.tag_title}</Text>
+            <View style={styles.tagItemContainer}>
+                <View style={styles.tagItem}>
+                    <Text style={styles.tagText}>{item.tag_title}</Text>
                     <ClearButton
                         color='lightgray'
                         onPress={() => this.removeTag(index)}
@@ -161,6 +162,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         width: SCREEN_WIDTH,
+    },
+    tagItemContainer: {
+        marginBottom: 10,
+        flexDirection: 'ro0w',
+        justifyContent: 'center',
+    },
+    tagItem: {
+        flexDirection: 'row',
+        borderRadius: 5,
+        backgroundColor: '#f4f7f8',
+    },
+    tagText: {
+        padding: 5,
+        paddingRight: 0,
     }
 })
 
