@@ -1,39 +1,78 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, DeviceEventEmitter } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, DeviceEventEmitter, StyleSheet } from 'react-native';
 
 import Tag from '../Tag';
 
+// TODO: Revamp this into a component that can be used for synonyms as well
+
 class TagInformation extends React.Component {
 
-    render() {
+    constructor(props) {
+        super(props);
+    }
+
+    // Render tag header
+    _renderHeader = () => {
         return(
-            <FlatList
-                data={this.props.data}
-                style={{flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center'}}
-                renderItem={this.renderTag} 
-                keyExtractor={(item, index) => index.toString()}
-                listKey={(item, index) => index.toString()}
-            />
+            <View style={styles.headerContainer}>
+                <Text style={styles.headerText}>Tags:</Text>
+            </View>
         )
     }
 
-    renderTag = ({item, index}) => {
-        if (index==0) {
-            // Render tag header
-            return (
-                <View style={{marginRight: 5, marginBottom: 10}}>
-                    <Text style={{fontSize: 12, color: 'green'}}>{item.tag_title}</Text>
+    render() {
+        if (this.props.data.length >= 1) {
+            return(
+                <View style={styles.container}>
+                    {
+                        // Header
+                        this.props.header ? this._renderHeader() : null
+                    }
+                    <FlatList
+                        data={this.props.data}
+                        style={styles.tagListContainer}
+                        renderItem={this.renderTag} 
+                        keyExtractor={(item, index) => index.toString()}
+                        listKey={(item, index) => index.toString()}
+                    />
                 </View>
             )
         } else {
-            // Render tag
-            return (
-                <TouchableOpacity onPress={() => DeviceEventEmitter.emit("change_title", (item))}>
-                    <Tag value={item.tag_title} style={{marginRight: 5, marginBottom: 10}}/>
-                </TouchableOpacity>
-            )
+            return(null);
         }
+    }
+
+    renderTag = ({item, index}) => {
+        return (
+            <TouchableOpacity onPress={() => DeviceEventEmitter.emit("change_title", (item))}>
+                <Tag value={item.tag_title} style={styles.tagItem}/>
+            </TouchableOpacity>
+        )
     }    
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    tagListContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+    },
+    headerContainer: {
+        marginRight: 5,
+        marginBottom: 10,
+    },
+    headerText: {
+        fontSize: 12,
+        color: 'green',
+    },
+    tagItem: {
+        marginRight: 5,
+        marginBottom: 10,
+    }
+})
 
 export default TagInformation;
