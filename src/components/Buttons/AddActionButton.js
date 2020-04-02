@@ -2,7 +2,7 @@ import React from 'react';
 import ActionButton from 'react-native-action-button';
 import { withNavigation } from 'react-navigation';
 
-import { colors } from '../Styles';
+import { colors } from '../../Styles';
 
 class AddActionButton extends React.Component {
 

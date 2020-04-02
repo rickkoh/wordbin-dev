@@ -3,7 +3,7 @@ import { View, StyleSheet, FlatList, TextInput, Text } from 'react-native';
 
 import Tag from '../components/Tag';
 
-import { SCREEN_WIDTH } from '../Measurements';
+import { SCREEN_WIDTH } from '../Styles';
 
 // Maybe make this prop to display only tags but not add tags(?)
 class TextList extends React.Component {

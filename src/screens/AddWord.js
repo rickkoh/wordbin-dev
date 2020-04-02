@@ -6,7 +6,7 @@ import Modal from 'react-native-modal';
 import { colors, headerStyles, SCREEN_HEIGHT, SCREEN_WIDTH } from '../Styles';
 
 import Header from '../components/Header';
-import PillButton from '../components/PillButton';
+import PillButton from '../components/Buttons/PillButton';
 import WordInput from '../components/Forms/WordInput';
 import PronunciationInput from '../components/Forms/PronunciationInput';
 import MeaningForm from '../components/Forms/MeaningForm';

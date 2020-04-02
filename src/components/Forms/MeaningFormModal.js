@@ -5,7 +5,7 @@ import Modal from 'react-native-modal';
 
 import Header from '../../components/Header';
 import { headerStyles, colors } from '../../Styles';
-import TextButton from '../TextButton';
+import TextButton from '../Buttons/TextButton';
 
 class MeaningFormModal extends React.Component {
 

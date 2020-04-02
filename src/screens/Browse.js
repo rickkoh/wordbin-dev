@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, ListView, Text, Animated } from 'react-native';
 
 import Header from '../components/Header';
-import PillButton from '../components/PillButton';
+import PillButton from '../components/Buttons/PillButton';
 import TextList from '../prototypes/TextList';
 
 import { colors } from '../Styles';

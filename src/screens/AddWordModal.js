@@ -5,7 +5,7 @@ import { Icon } from 'react-native-elements';
 import { colors } from '../Styles';
 
 import Modal from 'react-native-modal';
-import PillButton from '../components/PillButton';
+import PillButton from '../components/Buttons/PillButton';
 
 import WordInput from '../components/Forms/WordInput';
 import PronunciationInput from '../components/Forms/PronunciationInput';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { colors } from '../Styles';
-import ClearButton from './ClearButton';
+import ClearButton from './Buttons/ClearButton';
 
 class Tag extends React.Component {
 

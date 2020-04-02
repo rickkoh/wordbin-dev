@@ -5,7 +5,7 @@ import Modal from 'react-native-modal';
 
 import database from '../../services/Database';
 
-import PillButton from '../PillButton';
+import PillButton from '../Buttons/PillButton';
 
 import { TextInput } from 'react-native-gesture-handler';
 import { colors } from '../../Styles';

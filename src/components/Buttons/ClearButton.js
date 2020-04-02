@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { colors } from '../Styles';
+import { colors } from '../../Styles';
 
 class ClearButton extends React.Component {
 

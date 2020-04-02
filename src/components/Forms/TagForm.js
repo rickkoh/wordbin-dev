@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, TextInput, Text, FlatList } from 'react-native';
 
-import ClearButton from '../ClearButton';
+import ClearButton from '../Buttons/ClearButton';
 
-import { SCREEN_WIDTH } from '../../Measurements';
+import { SCREEN_WIDTH } from '../../Styles';
 
 class TagForm extends React.Component {
 

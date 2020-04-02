@@ -13,7 +13,7 @@ import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
 
 import WordCard from '../components/WordCard';
 import AddWordCard from '../components/AddWordCard';
-import AddActionButton from '../components/AddActionButton';
+import AddActionButton from '../components/Buttons/AddActionButton';
 import database from '../services/Database';
 
 import FlatListWithCollapsibleHeader from '../components/FlatListWithCollapsibleHeader';
@@ -114,7 +114,7 @@ export default class HomeScreen extends React.Component {
     }
 
     test = () => {
-        // console.log(this.state);
+        console.log(this.state);
         this._menu.show();
         // this.toggleModalVisibility();
     }
