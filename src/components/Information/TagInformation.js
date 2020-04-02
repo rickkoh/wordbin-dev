@@ -15,7 +15,7 @@ class TagInformation extends React.Component {
     _renderHeader = () => {
         return(
             <View style={styles.headerContainer}>
-                <Text style={styles.headerText}>Tags:</Text>
+                <Text style={styles.headerText}>{this.props.headerText ? this.props.headerText : "Header"}:</Text>
             </View>
         )
     }
@@ -23,19 +23,14 @@ class TagInformation extends React.Component {
     render() {
         if (this.props.data.length >= 1) {
             return(
-                <View style={styles.container}>
-                    {
-                        // Header
-                        this.props.header ? this._renderHeader() : null
-                    }
-                    <FlatList
-                        data={this.props.data}
-                        style={styles.tagListContainer}
-                        renderItem={this.renderTag} 
-                        keyExtractor={(item, index) => index.toString()}
-                        listKey={(item, index) => index.toString()}
-                    />
-                </View>
+                <FlatList
+                    data={this.props.data}
+                    style={styles.tagListContainerStyle}
+                    contentContainerStyle={styles.tagListContentContainerStyle}
+                    renderItem={this.renderTag} 
+                    keyExtractor={(item, index) => index.toString()}
+                    listKey={(item, index) => index.toString()}
+                />
             )
         } else {
             return(null);
@@ -43,31 +38,46 @@ class TagInformation extends React.Component {
     }
 
     renderTag = ({item, index}) => {
-        return (
-            <TouchableOpacity onPress={() => DeviceEventEmitter.emit("change_title", (item))}>
-                <Tag value={item.tag_title} style={styles.tagItem}/>
-            </TouchableOpacity>
-        )
+        if (this.props.header && index == 0) {
+            return (
+                <View style={styles.tagListContentContainerStyle}>
+                    {this._renderHeader()}
+                    <TouchableOpacity onPress={() => DeviceEventEmitter.emit("change_title", (item))}>
+                        <Tag value={item.tag_title} style={styles.tagItem}/>
+                    </TouchableOpacity>
+                </View>
+            )
+        } else {
+            return (
+                <TouchableOpacity onPress={() => DeviceEventEmitter.emit("change_title", (item))}>
+                    <Tag value={item.tag_title} style={styles.tagItem}/>
+                </TouchableOpacity>
+            )
+        }
     }    
 }
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         flexDirection: 'row',
-        alignItems: 'center',
     },
-    tagListContainer: {
+    tagListContainerStyle: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+    },
+    tagListContentContainerStyle: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         alignItems: 'center',
     },
     headerContainer: {
-        marginRight: 5,
-        marginBottom: 10,
     },
     headerText: {
         fontSize: 12,
         color: 'green',
+        marginRight: 5,
+        marginBottom: 10,
     },
     tagItem: {
         marginRight: 5,
