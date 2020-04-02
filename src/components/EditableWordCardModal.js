@@ -7,7 +7,7 @@ import Modal from 'react-native-modal';
 import PillButton from '../components/PillButton';
 
 import MeaningInformation from '../components/Information/MeaningInformation';
-import TagInformation1 from '../components/Information/TagInformation1';
+import TagInformation from '../components/Information/TagInformation';
 
 import WordInput from '../components/Forms/WordInput';
 import PronunciationInput from '../components/Forms/PronunciationInput';
@@ -20,67 +20,87 @@ class EditableWordCardModal extends React.Component {
     constructor(props) {
         super(props);
 
-        // Self-governing modal - cohesiveness
         // Props
         // isEditable
         // isVisible
         // onBackdropPress
 
-        // Get word
-        // Copy word
-        // Edit copied word
-        // a. Saves the edited word
-        // b. Revert the changes
-
         this.state = {
+            isVisible: false,
             isEditable: false,
-            word: this.props.word,
+            isEdited: false,
+            word: JSON.parse(JSON.stringify(this.props.word)),
         }
+
     }
 
     componentDidUpdate(prevProps, prevState) {
-        // Reset the isEditable back to default
-        if (!this.props.isVisible && this.state.isEditable) {
-            this.setState({isEditable: false});
-        }
+        // Update isEdited state if word is edited
+        // CONDITION: Word isn't the same as before AND isEdited is still false AND word can be edited (isEditable is true)
+        if (this.state.word != prevState.word && !this.state.isEdited && this.state.isEditable) this.setState({isEdited: true});
 
-        if (this.state != prevState) {
+        // Call onWordDataChange function is word isn't the same as before
+        if (this.state.word != prevState.word) {
+            // Can remove
+            console.log("Word data changed.");
             this.props.onWordDataChange ? this.props.onWordDataChange(this.state.word) : null;
         }
+
+        // Modal state is defined as 'destroyed' when it is no longer visible
+        // Reset properties back to default
+        if (!this.props.isVisible && this.props.isVisible != prevProps.isVisible) {
+
+            // Can remove
+            console.log("Resetting");
+
+            // Default states (same as the one in constructor)
+            this.state = {
+                isEditable: false,
+                isEdited: false,
+                word: JSON.parse(JSON.stringify(this.props.word)),
+            }
+
+            this.setState(this.state);
+        }
+    }
+
+    setIsEditable = (value) => {
+        value ? this.setState({isEditable: value}) : this.setState({isEditable: true})
     }
 
     // Handles onBackdropPress
     onBackdropPress = () => {
-        console.log(this.state.word);
-        this.setState({isEditable: false});
-        try {
-            this.props.onBackdropPress();
-        } catch { }
+        if (this.state.isEdited) {
+            // Can remove
+            console.log("Detects word edited.");
+            // Prompts user if he/she wants to save changes
+        }
+        this.props.onBackdropPress ? this.props.onBackdropPress() : null;
     }
 
     // Handles onEditButtonPress
     onEditButtonPress = () => {
-        this.setState(prevState => ({isEditable: !prevState.isEditable}));
-        try {
-            this.props.onEditButtonPress();
-        } catch { }
+        this.setState({isEditable: true})
+        this.props.onEditButtonPress ? this.props.onEditButtonPress() : null;
     }
 
     // Handles onCancelButtonPress
     onCancelButtonPress = () => {
-        this.setState(prevState => ({isEditable: !prevState.isEditable}));
-        try {
-            this.props.onCancelButtonPress();
-        } catch { }
+        this.setState({isEditable: false});
+        this.props.onCancelButtonPress ? this.props.onCancelButtonPress() : null;
     }
 
-    // Hanldes onDoneButtonPress
+    // Handles onDoneButtonPress
     onDoneButtonPress = () => {
-        // Perform SQL update query
-        // Return new Promise
-        // reject: return false
-        // success: return word object
+        // Function shouldn't be executed
+        if (this.state.isEdited) {
+            this.updateData();
+            this.props.onWordDataHasChanged ? this.props.onWordDataHasChanged(this.state.word) : null;
+        }
+        this.props.onDoneButtonPress ? this.props.onDoneButtonPress() : null;
+    }
 
+    updateData = () => {
         async function asyncForEach(array, callback) {
             for (let index = 0; index < array.length; index++) {
                 await callback(array[index], index, array);
@@ -109,16 +129,13 @@ class EditableWordCardModal extends React.Component {
         });
 
         if (databaseChanged) DeviceEventEmitter.emit("database_changed");
-
-        try {
-            this.props.onDoneButtonPress();
-        } catch { }
     }
 
     // Render modal content based on editable
     renderModalContent = () => {
         if (!this.state.isEditable) {
             // Render normal WordCardModal
+            // Uses data from prop
             return (
                 <View style={styles.container}>
                     <View style={styles.header}>
@@ -137,7 +154,9 @@ class EditableWordCardModal extends React.Component {
                         <MeaningInformation
                             data={this.props.word.Meanings}
                         />
-                        <TagInformation1
+                        <TagInformation
+                            header
+                            headerText="Tags"
                             data={this.props.word.Tags}
                         />
                     </ScrollView>
@@ -145,6 +164,7 @@ class EditableWordCardModal extends React.Component {
             )
         } else {
             // Render editable WordCardModal
+            // Uses data from state
             return (
                 <View style={styles.container}>
                     {
@@ -172,12 +192,12 @@ class EditableWordCardModal extends React.Component {
                         <MeaningForm
                             autofocus
                             data={this.state.word.Meanings}
-                            onMeaningIndexChange={() => console.log('display')}
+                            onMeaningIndexChange={() => console.log('Meaning index changed.')}
                             onMeaningDataChange={(meaning) =>  {
+                                console.log("Meaning data changed.");
                                 word = this.state.word;
                                 word.Meanings = meaning;
-                                this.setState({word: word})
-                                console.log(this.state.word);
+                                this.setState({word: JSON.parse(JSON.stringify(word))})
                             }}
                         />
                         <TagForm
