@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, DeviceEventEmitter, StyleSheet, Text, Image } from 'react-native';
+import { View, ScrollView, DeviceEventEmitter, StyleSheet, Text, Image } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { withNavigation } from 'react-navigation';
 
@@ -27,24 +27,7 @@ class WordCard extends React.Component {
         this.state = {
             isModalVisible: false,
             isCardModalVisible: false,
-            // NOTE: Once the 'Done' button is clicked the word information
-            // will be updated with the editedWord information in the database
-            editedWord: {
-                word_text: this.props.word.word_text,
-                word_pronunciation: this.props.word.word_pronunciation,
-            }
-        }
-    }
-
-    cleanString() {
-        this.cleanTag();
-    }
-
-    cleanTag() {
-        // Adding header
-        // TODO: Might not be a proper way to do this. Needs a revamp
-        if (this.props.word.Tags.length > 0 && this.props.word.Tags[0].tag_title != "Tags: ") {
-            this.props.word.Tags.unshift({tag_title: "Tags: "})
+            word: this.props.word,
         }
     }
 
@@ -58,11 +41,18 @@ class WordCard extends React.Component {
 
     render() {
 
-        this.cleanString();
-
         // Render WordCard
         return(
             <View style={[{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 10, backgroundColor: 'white'}, styles.boxWithShadow]}>
+                <EditableWordCardModal
+                    ref={(ref) => this.cardModal = ref}
+                    isVisible={this.state.isCardModalVisible}
+                    onDoneButtonPress={() => this.setState({isCardModalVisible: false})}
+                    onBackdropPress={() => this.setState(prevState => ({isCardModalVisible: !prevState.isCardModalVisible}))}
+                    word={this.state.word}
+                    onWordDataHasChanged={(word) => this.setState({word: word})}
+                    // onWordDataChange={(word) => console.log(word)}
+                />
                 {
                     // Header
                     this._renderHeader()
@@ -70,24 +60,25 @@ class WordCard extends React.Component {
                 {
                     // Title
                 }
-                <Text style={{fontSize: 20, marginBottom: 5}} onPress={() => this.setState({isCardModalVisible: true})}>{this.props.word.word_text}</Text>
+                <Text style={{fontSize: 20, marginBottom: 5}} onPress={() => this.setState({isCardModalVisible: !this.state.isCardModalVisible})}>{this.state.word.word_text}</Text>
                 {
                     // Pronunciation
                 }
-                {this.props.word.word_pronunciation == undefined ? null : (
-                    <Text style={{fontSize: 12, marginBottom: 5 }}>{this.props.word.word_pronunciation}</Text>
+                {this.state.word.word_pronunciation == undefined ? null : (
+                    <Text style={{fontSize: 12, marginBottom: 5 }}>{this.state.word.word_pronunciation}</Text>
                 )}
                 {
                     // Meanings
                 }
                 <MeaningInformation
-                    data={this.props.word.Meanings}
+                    data={this.state.word.Meanings}
                 />
                 {
                     // Tags
                 }
                 <TagInformation
-                    data={this.props.word.Tags}
+                    header
+                    data={this.state.word.Tags}
                 />
                 {
                     // Google Search Button
@@ -97,21 +88,13 @@ class WordCard extends React.Component {
                         <Image source={require('../assets/googlelogo1.jpg')} style={{height: 20, width: 20}}></Image>
                     </TouchableOpacity>
                 </View>
-
                 {
                     // Browser
                 }
-                <WordBrowser isVisible={this.state.isModalVisible} word={this.props.word.word_text} onCloseButtonPress={() => this.setState({isModalVisible: false})}/>
+                <WordBrowser isVisible={this.state.isModalVisible} word={this.state.word.word_text} onCloseButtonPress={() => this.setState({isModalVisible: false})}/>
                 {
                     // WordCardModal
                 }
-                <EditableWordCardModal
-                    isVisible={this.state.isCardModalVisible}
-                    onDoneButtonPress={() => this.setState({isCardModalVisible: false})}
-                    onBackdropPress={() => this.setState(prevState => ({isCardModalVisible: !prevState.isCardModalVisible}))}
-                    word={this.props.word}
-                    onWordDataChange={(word) => console.log(word)}
-                />
             </View>
         )
     }
@@ -134,15 +117,16 @@ class WordCard extends React.Component {
 
     _renderMenu = () => {
         return(
-            <Menu ref={(ref) => this._menu = ref} style={{backgroundColor: 'black'}}>
+            <Menu ref={(ref) => this._menu = ref} style={{backgroundColor: 'black'}} onHidden={() => {this.onMenuHidden(); this.onMenuHidden = () => {};}}>
                 <MenuItem onPress={() => {
-                    console.log('Edit ' + this.props.word.word_text);
+                    console.log('Hide ' + this.state.word.word_text);
                     this.hideMenu();
                 }}>
                     <Text style={{color: 'white'}}>Hide</Text>
                 </MenuItem>
                 <MenuItem onPress={() => {
-                    console.log('Edit ' + this.props.word.word_text);
+                    console.log('Edit ' + this.state.word.word_text);
+                    this.onMenuHidden = () => {this.setState({isCardModalVisible: true}); this.cardModal.setIsEditable();};
                     this.hideMenu();
                 }}>
                     <Text style={{color: 'white'}}>Edit</Text>
@@ -160,7 +144,7 @@ class WordCard extends React.Component {
                     <Text style={{color: 'white'}}>Shift Down</Text>
                 </MenuItem>
                 <MenuItem onPress={() => {
-                    database.deleteWord(this.props.word.word_id).then(() => DeviceEventEmitter.emit('database_changed'));
+                    database.deleteWord(this.state.word.word_id).then(() => DeviceEventEmitter.emit('database_changed'));
                     this.hideMenu();
                 }}>
                     <Text style={{color: 'white'}}>Delete</Text>
