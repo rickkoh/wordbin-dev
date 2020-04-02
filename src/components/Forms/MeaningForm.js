@@ -10,7 +10,7 @@ class MeaningForm extends React.Component {
         super(props);
 
         this.state = {
-            meaning: this.props.data,
+            meaning: JSON.parse(JSON.stringify(this.props.data)),
             meaningIndex: 0,
             isModalVisible: false,
         }
@@ -30,7 +30,7 @@ class MeaningForm extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
         // onMeaningDataChanged = {(meaning) => //handle meaningData}
-        if (this.state != prevState) {
+        if (this.state.meaning != prevState.meaning) {
             this.props.onMeaningDataChange ? this.props.onMeaningDataChange(this.state.meaning) : null;
         }
     }
@@ -38,7 +38,7 @@ class MeaningForm extends React.Component {
     // Scroll to index function
     scrollToIndex = (index, animated) => {
         // Ensure index is within range
-        if (index > -1 && index < this.props.data.length) {
+        if (index > -1 && index < this.state.meaning.length) {
             // Scroll to index
             this.flatList.scrollToIndex({animated: animated, index: index});
         } 
@@ -46,7 +46,7 @@ class MeaningForm extends React.Component {
 
     // Update data function
     updateData = () => {
-        this.setState({meaning: this.props.data});
+        this.setState({meaning: JSON.parse(JSON.stringify(this.props.data))});
     }
 
     onViewableItemsChanged = ({ viewableItems }) => {
@@ -98,7 +98,7 @@ class MeaningForm extends React.Component {
             }
         }
 
-        this.setState({ meaning: meaning });
+        this.setState({meaning: JSON.parse(JSON.stringify(meaning))});
         this.props.onMeaningTextChange ? this.props.onMeaningTextChange(text, index) : null;
     }
 
