@@ -4,7 +4,7 @@ import { DeviceEventEmitter, View, StyleSheet, Text, TouchableOpacity, ScrollVie
 import { SCREEN_HEIGHT, colors } from '../Styles';
 
 import Modal from 'react-native-modal';
-import PillButton from '../components/PillButton';
+import PillButton from './Buttons/PillButton';
 
 import MeaningInformation from '../components/Information/MeaningInformation';
 import TagInformation from '../components/Information/TagInformation';
@@ -93,13 +93,15 @@ class EditableWordCardModal extends React.Component {
     // Handles onDoneButtonPress
     onDoneButtonPress = () => {
         // Function shouldn't be executed
-        if (this.state.isEdited) {
+        if (this.state.isEditable && this.state.isEdited) {
             this.updateData();
             this.props.onWordDataHasChanged ? this.props.onWordDataHasChanged(this.state.word) : null;
         }
         this.props.onDoneButtonPress ? this.props.onDoneButtonPress() : null;
     }
 
+    // Update the word data to the database
+    // Question: how to deal with extra data coming in.
     updateData = () => {
         async function asyncForEach(array, callback) {
             for (let index = 0; index < array.length; index++) {
@@ -120,11 +122,20 @@ class EditableWordCardModal extends React.Component {
         asyncForEach(this.state.word.Meanings, async (meaning, index) => {
             // Check if meaning object changed
             if (this.state.word.Meanings[index] != meaning) {
+                // Update meaning text
                 await database.updateMeaningText(meaning.meaning_id, meaning.meaning_text).then(rowsAffected => {
                     if (rowsAffected !== undefined && rowsAffected > 0) {
                         databaseChanged = true;
                     }
+                });
+                // Update meaning classification
+                await database.updateMeaningClassification(meaning.meaning_id, meaning.meaning_classification).then(rowsAffected => {
+                    if (rowsAffected !== undefined && rowsAffected > 0) {
+                        databaseChanged = true;
+                    }
                 })
+                // Update meaning sentence example
+                // Update meaning meaning synonyms
             }
         });
 
