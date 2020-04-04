@@ -3,7 +3,7 @@ import { Animated, StyleSheet, View } from 'react-native';
 import { STATUS_BAR_HEIGHT, colors } from '../Styles';
 
 class FlatListWithCollapsibleHeader extends React.Component {
-    
+
     containerPaddingTop = this.props.containerPaddingTop != undefined ? this.props.containerPaddingTop : 0;
     containerPaddingBottom = this.props.containerPaddingBottom != undefined ? this.props.containerPaddingBottom : 0;
     navHeight = this.props.navHeight != undefined ? this.props.navHeight : 0;
@@ -84,6 +84,7 @@ class FlatListWithCollapsibleHeader extends React.Component {
                 <Animated.FlatList
                     data={this.props.data}
                     renderItem={this.props.renderItem}
+                    keyExtractor={this.props.keyExtractor}
                     style={[this.props.style]}
                     contentContainerStyle={[{paddingTop: this.NAVBAR_HEIGHT}, this.props.contentContainerStyle]}
                     scrollEventThrottle={1}

@@ -161,7 +161,7 @@ export default class HomeScreen extends React.Component {
                     this.state.Words == undefined ? (
                         // Render for the condition: loading
                         <LoadingPage/>
-                    ) : 
+                    ) :
                     this.state.Words.length <= 0 ? (
                         // Render for the condition: no words
                         <FlatListWithCollapsibleHeader
@@ -179,6 +179,7 @@ export default class HomeScreen extends React.Component {
                             navHeight={44}
                             containerPaddingTop={0}
                             data={this.state.Words}
+                            keyExtractor={item => item.word_id}
                             renderItem={({item}) => <WordCard word={item} onCardPress={this.props.onCardPress}/>}
                         />
                 )
