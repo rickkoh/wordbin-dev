@@ -7,13 +7,15 @@ import Modal from 'react-native-modal';
 import PillButton from './Buttons/PillButton';
 
 import MeaningInformation from '../components/Information/MeaningInformation';
-import TagInformation from '../components/Information/TagInformation';
+import HorizontalList from './HorizontalList';
 
 import WordInput from '../components/Forms/WordInput';
 import PronunciationInput from '../components/Forms/PronunciationInput';
 import MeaningForm from '../components/Forms/MeaningForm';
 import TagForm from '../components/Forms/TagForm';
 import database from '../services/Database';
+
+import Tag from '../components/Tag';
 
 class EditableWordCardModal extends React.Component {
 
@@ -165,10 +167,16 @@ class EditableWordCardModal extends React.Component {
                         <MeaningInformation
                             data={this.props.word.Meanings}
                         />
-                        <TagInformation
-                            header
+                        <HorizontalList
                             headerText="Tags"
+                            headerStyle={{margin: 5, marginLeft: 0}}
+                            headerTextStyle={{color: 'green'}}
                             data={this.props.word.Tags}
+                            renderItem={(tag, index) => (
+                                <View style={{margin: 5, marginLeft: 0}}>
+                                    <Tag value={tag.tag_title}/>
+                                </View>
+                            )}
                         />
                     </ScrollView>
                 </View>
