@@ -14,9 +14,10 @@ import { TouchableOpacity, TextInput } from 'react-native-gesture-handler';
 import database from '../services/Database';
 
 import MeaningInformation from '../components/Information/MeaningInformation';
-import TagInformation from '../components/Information/TagInformation';
 import EditableWordCardModal from './EditableWordCardModal';
 import WordBrowser from './WordBrowser';
+import HorizontalList from './HorizontalList';
+import Tag from './Tag';
 
 // Takes in a
 class WordCard extends React.Component {
@@ -44,15 +45,6 @@ class WordCard extends React.Component {
         // Render WordCard
         return(
             <View style={[{ minHeight: 20, margin: 10, marginBottom: 0, padding: 10, borderRadius: 10, backgroundColor: 'white'}, styles.boxWithShadow]}>
-                <EditableWordCardModal
-                    ref={(ref) => this.cardModal = ref}
-                    isVisible={this.state.isCardModalVisible}
-                    onDoneButtonPress={() => this.setState({isCardModalVisible: false})}
-                    onBackdropPress={() => this.setState(prevState => ({isCardModalVisible: !prevState.isCardModalVisible}))}
-                    word={this.state.word}
-                    onWordDataHasChanged={(word) => this.setState({word: word})}
-                    // onWordDataChange={(word) => console.log(word)}
-                />
                 {
                     // Header
                     this._renderHeader()
@@ -76,9 +68,16 @@ class WordCard extends React.Component {
                 {
                     // Tags
                 }
-                <TagInformation
-                    header
+                <HorizontalList
+                    headerText="Tags"
+                    headerStyle={{margin: 5, marginLeft: 0}}
+                    headerTextStyle={{color: 'green'}}
                     data={this.state.word.Tags}
+                    renderItem={(tag, index) => (
+                        <View style={{margin: 5, marginLeft: 0}}>
+                            <Tag value={tag.tag_title}/>
+                        </View>
+                    )}
                 />
                 {
                     // Google Search Button
@@ -91,6 +90,15 @@ class WordCard extends React.Component {
                 {
                     // Browser
                 }
+                <EditableWordCardModal
+                    ref={(ref) => this.cardModal = ref}
+                    isVisible={this.state.isCardModalVisible}
+                    onDoneButtonPress={() => this.setState({isCardModalVisible: false})}
+                    onBackdropPress={() => this.setState(prevState => ({isCardModalVisible: !prevState.isCardModalVisible}))}
+                    word={this.state.word}
+                    onWordDataHasChanged={(word) => this.setState({word: word})}
+                    // onWordDataChange={(word) => console.log(word)}
+                />
                 <WordBrowser isVisible={this.state.isModalVisible} word={this.state.word.word_text} onCloseButtonPress={() => this.setState({isModalVisible: false})}/>
                 {
                     // WordCardModal
