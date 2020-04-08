@@ -15,6 +15,9 @@ class MeaningForm extends React.Component {
             isModalVisible: false,
         }
 
+        this.itemWidth;
+        this.itemPaddingRight = 20;
+
         // Props
         // meaningValue
         // classificationValue
@@ -111,6 +114,11 @@ class MeaningForm extends React.Component {
 
     render() {
         return(
+            <View style={styles.container} onLayout={(event) => {
+                // Retrieve width value so as to adjust the item column width
+                var {_, _, width, _} = event.nativeEvent.layout;
+                this.itemWidth = width;
+            }}>
             <FlatList
                 ref={(ref) => { this.flatList = ref }}
                 keyboardShouldPersistTaps="always"
@@ -124,17 +132,18 @@ class MeaningForm extends React.Component {
                 keyExtractor={(item, index) => index.toString()}
                 listKey={(item, index) => index.toString()}
             />
+            </View>
         )
     }
 
     _renderMeaningColumn = ({item, index}) => {
         return(
-            <View style={styles.container}>
+            <View style={[styles.container, {paddingRight: this.itemPaddingRight}]}>
                 <TextInput
                     multiline
                     ref={ref => this[`meaningTextInput${index}`] = ref}
                     hasFocus={false}
-                    style={styles.meaningTextInput}
+                    style={[styles.meaningTextInput, {width: this.itemWidth ? this.itemWidth-this.itemPaddingRight : null}]}
                     placeholder="Meaning of word"
                     value={item.meaning_text}
                     onFocus={this.onMeaningTextFocus}
@@ -174,13 +183,11 @@ const styles = StyleSheet.create({
     rowContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        // paddingHorizontal: 20,
         marginVertical: 10,
     },
     meaningTextInput: {
         flex: 1,
-        width: SCREEN_WIDTH,
-        // paddingHorizontal: 20,
+        // Width is dynamic
         textAlignVertical: 'top',
         fontSize: 16,
     },
