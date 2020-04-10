@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { createAppContainer, DrawerItems } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
+import { createAppContainer, DrawerItems, createStackNavigator } from 'react-navigation';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 
 // Components

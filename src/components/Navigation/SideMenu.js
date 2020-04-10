@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, DeviceEventEmitter, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, DeviceEventEmitter, Text, TextInput, FlatList, TouchableOpacity } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import Modal from 'react-native-modal';
 
@@ -7,7 +7,6 @@ import database from '../../services/Database';
 
 import PillButton from '../Buttons/PillButton';
 
-import { TextInput } from 'react-native-gesture-handler';
 import { colors } from '../../Styles';
 
 class SideMenu extends React.Component {

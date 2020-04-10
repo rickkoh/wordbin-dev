@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, DeviceEventEmitter } from 'react-native';
+import { StyleSheet, FlatList, Image, Text, View, TouchableOpacity, DeviceEventEmitter } from 'react-native';
 import { Icon } from 'react-native-elements';
 import * as FileSystem from 'expo-file-system';
 
@@ -8,7 +8,6 @@ import Header from '../components/Header';
 import database from '../services/Database';
 
 import { colors, headerStyles } from '../Styles';
-import { FlatList } from 'react-native-gesture-handler';
 
 export default class SettingsScreen extends React.Component {
 
