@@ -1,5 +1,6 @@
 import React from 'react';
-import { DeviceEventEmitter, ScrollView, FlatList, NetInfo, KeyboardAvoidingView, Text, View, TouchableOpacity, StyleSheet } from 'react-native';
+import { DeviceEventEmitter, ScrollView, FlatList, KeyboardAvoidingView, Text, View, TouchableOpacity, StyleSheet } from 'react-native';
+import NetInfo from "@react-native-community/netinfo";
 import { Icon } from 'react-native-elements';
 import Modal from 'react-native-modal';
 
@@ -120,7 +121,7 @@ class AddWordScreen extends React.Component {
 
     apiButtonPressed = () => {
         // Fetch data when api button is pressed
-        NetInfo.getConnectionInfo().then((connectionInfo) => {
+        NetInfo.fetch().then(connectionInfo => {
             if (connectionInfo.type != 'none') {
                 // Replace spaces with dashes
                 word = this.state.word.word_text.split(" ").join("-");

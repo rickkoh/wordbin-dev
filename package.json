@@ -8,6 +8,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-community/netinfo": "^5.7.0",
     "braces": "^3.0.2",
     "expo": "^37.0.0",
     "expo-haptics": "~8.1.0",
