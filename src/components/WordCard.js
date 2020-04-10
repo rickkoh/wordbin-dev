@@ -125,7 +125,7 @@ class WordCard extends React.Component {
 
     _renderMenu = () => {
         return(
-            <Menu ref={(ref) => this._menu = ref} style={{backgroundColor: 'black'}} onHidden={() => {this.onMenuHidden(); this.onMenuHidden = () => {};}}>
+            <Menu ref={(ref) => this._menu = ref} style={{backgroundColor: 'black'}} onHidden={() => {this.onMenuHidden ? this.onMenuHidden : null; this.onMenuHidden = null;}}>
                 <MenuItem onPress={() => {
                     console.log('Hide ' + this.state.word.word_text);
                     this.hideMenu();

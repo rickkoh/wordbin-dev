@@ -6,6 +6,7 @@ import Modal from 'react-native-modal';
 import Header from '../../components/Header';
 import { headerStyles, colors } from '../../Styles';
 import TextButton from '../Buttons/TextButton';
+import PillButton from '../Buttons/PillButton';
 
 class MeaningFormModal extends React.Component {
 
@@ -20,32 +21,42 @@ class MeaningFormModal extends React.Component {
                 style={{margin: 0}}
             >
                 <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+                    {
+                    // <View style={styles.modal}>
+                        // <Header
+                            // headerRight={
+                                // <TextButton text="Done" style={headerStyles.headerButtonRight} onPress={this.props.toggleVisibility}/>
+                            // }
+                        // />
+                        // <Text style={{fontSize: 24, marginLeft: 20, color: this.props.meaning.meaning_text == undefined ? colors.default.gray : colors.default.black}}>{this.props.meaning.meaning_text == undefined ? "Meaning of word" : this.props.meaning.meaning_text}</Text>
+                        // <TextInput
+                            // multiline
+                            // ref={ref => this.wordInput = ref}
+                            // style={styles.textBox}
+                            // placeholder="Sentence Example"
+                        // />
+                        // <TextInput
+                            // style={styles.textInput}
+                            // placeholder="Synonyms"
+                        // />
+                        // <TextInput
+                            // style={styles.textInput}
+                            // placeholder="Antonyms"
+                        // />
+                        // <TextInput
+                            // style={styles.lastTextInput}
+                            // placeholder="Origin"
+                        // />
+                        // <KeyboardBar renderContent={this.props.keyboardBar}/>
+                    // </View>
+                    }
                     <View style={styles.modal}>
                         <Header
+                            backgroundColor={colors.default.blue}
                             headerRight={
-                                <TextButton text="Done" style={headerStyles.headerButtonRight} onPress={this.props.toggleVisibility}/>
+                                <PillButton text="Done" style={headerStyles.headerButtonRight} backgroundColor={colors.default.backgroundColor} textColor={colors.default.blue}/>
                             }
                         />
-                        <Text style={{fontSize: 24, marginLeft: 20, color: this.props.meaning.meaning_text == undefined ? colors.default.gray : colors.default.black}}>{this.props.meaning.meaning_text == undefined ? "Meaning of word" : this.props.meaning.meaning_text}</Text>
-                        <TextInput
-                            multiline
-                            ref={ref => this.wordInput = ref}
-                            style={styles.textBox}
-                            placeholder="Sentence Example"
-                        />
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder="Synonyms"
-                        />
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder="Antonyms"
-                        />
-                        <TextInput
-                            style={styles.lastTextInput}
-                            placeholder="Origin"
-                        />
-                        <KeyboardBar renderContent={this.props.keyboardBar}/>
                     </View>
                 </KeyboardAvoidingView>
             </Modal>

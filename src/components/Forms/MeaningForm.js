@@ -138,12 +138,12 @@ class MeaningForm extends React.Component {
 
     _renderMeaningColumn = ({item, index}) => {
         return(
-            <View style={[styles.container, {paddingRight: this.itemPaddingRight}]}>
+            <View style={[styles.container]}>
                 <TextInput
                     multiline
                     ref={ref => this[`meaningTextInput${index}`] = ref}
                     hasFocus={false}
-                    style={[styles.meaningTextInput, {width: this.itemWidth ? this.itemWidth-this.itemPaddingRight : null}]}
+                    style={[styles.meaningTextInput, {width: this.itemWidth ? this.itemWidth : null, paddingRight: this.itemPaddingRight}]}
                     placeholder="Meaning of word"
                     value={item.meaning_text}
                     onFocus={this.onMeaningTextFocus}
@@ -161,8 +161,8 @@ class MeaningForm extends React.Component {
                         onBlur={this.onClassificationTextBlur}
                         onChangeText={(text) => this.onClassificationTextChange(text, index)}
                     />
-                    <TouchableOpacity onPress={() => this.props.toggleVisibility()}>
-                        <Text style={{color: colors.default.blue}}>More options</Text>
+                    <TouchableOpacity onPress={() => this.props.toggleVisibility()} style={{borderRadius: 5, borderWidth: 1, borderColor: colors.default.blue, paddingVertical: 5, paddingHorizontal: 20}}>
+                        <Text style={{color: colors.default.blue, fontSize: 16}}>More Options</Text>
                     </TouchableOpacity>
                 </View>
 
