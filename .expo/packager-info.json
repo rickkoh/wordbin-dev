@@ -1,9 +1,10 @@
 {
   "expoServerPort": 19000,
   "packagerPort": 19001,
-  "packagerPid": 11072,
-  "expoServerNgrokUrl": "https://uq-sr2.rickkoh.wordbin-dev.exp.direct",
-  "packagerNgrokUrl": "https://packager.uq-sr2.rickkoh.wordbin-dev.exp.direct",
-  "ngrokPid": 7020,
-  "devToolsPort": 19002
+  "packagerPid": 4528,
+  "expoServerNgrokUrl": "https://ms-8qy.rickkoh.wordbin-dev.exp.direct",
+  "packagerNgrokUrl": "https://packager.ms-8qy.rickkoh.wordbin-dev.exp.direct",
+  "ngrokPid": 12972,
+  "devToolsPort": 19002,
+  "webpackServerPort": 19006
 }

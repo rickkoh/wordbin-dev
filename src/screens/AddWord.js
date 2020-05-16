@@ -347,6 +347,7 @@ class AddWordScreen extends React.Component {
                         toggleVisibility={this.toggleMeaningModalVisibility}
                     />
                     <TagForm
+                        style={{maxHeight: 160}}
                         data={this.state.tags}
                         onTagDataChange={(tags) => this.setState({tags: tags})}
                         onFocus={() => this.setState({keyboardBarType: 'tag'})}

@@ -107,7 +107,7 @@ class TagForm extends React.Component {
     // Render function
     render() {
         return(
-            <View style={{ maxHeight: 160 }}>
+            <View style={[this.props.style]}>
                 <TextInput
                     style={styles.textInput}
                     value={this.state.value}
